@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import API from '../api';
-import { Container, Row, Col, Card, Badge, Form, InputGroup, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Form, InputGroup, Button, Modal } from 'react-bootstrap';
 import {
   FiFileText, FiDownload, FiSearch, FiUser, FiGrid,
   FiServer, FiWifi, FiShield, FiDatabase, FiCpu,
   FiMonitor, FiHardDrive, FiActivity, FiGlobe, FiZap,
-  FiLogOut
+  FiLogOut, FiEye
 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,6 +30,8 @@ const MisManuales = () => {
   const [search, setSearch] = useState('');
   const [categoria, setCategoria] = useState('Todas');
   const [loading, setLoading] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
 
   const categorias = ['Todas', 'Manuales', 'Instructivo'];
 
@@ -77,6 +79,13 @@ const MisManuales = () => {
         window.URL.revokeObjectURL(url);
       })
       .catch(() => toast.error('Error al descargar'));
+  };
+
+  const handlePreview = (filename) => {
+    const token = localStorage.getItem('token');
+    var baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
+    setPreviewUrl(baseUrl + "/api/manuals/preview/" + filename + "?token=" + token);
+    setShowPreview(true);
   };
 
   const getCategoriaColor = (cat) => {
@@ -209,11 +218,18 @@ const MisManuales = () => {
                     <p style={{ color: '#666', fontSize: '0.85rem', flex: 1 }}>{manual.descripcion || 'Sin descripcion'}</p>
                     <div className="d-flex justify-content-between align-items-center mt-3 pt-3" style={{ borderTop: '1px solid #eee' }}>
                       <small style={{ color: '#999' }}><FiActivity className="me-1" />{new Date(manual.created_at).toLocaleDateString('es-VE')}</small>
-                      <Button variant="outline-primary" size="sm"
-                        onClick={() => handleDownload(manual.archivo, manual.titulo)}
-                        style={{ borderRadius: '8px', padding: '6px 15px' }}>
-                        <FiDownload className="me-1" /> Descargar
-                      </Button>
+                      <div className="d-flex gap-2">
+                        <Button variant="outline-secondary" size="sm"
+                          onClick={() => handlePreview(manual.archivo)}
+                          style={{ borderRadius: '8px', padding: '6px 12px' }}>
+                          <FiEye className="me-1" /> Ver
+                        </Button>
+                        <Button variant="outline-primary" size="sm"
+                          onClick={() => handleDownload(manual.archivo, manual.titulo)}
+                          style={{ borderRadius: '8px', padding: '6px 12px' }}>
+                          <FiDownload className="me-1" /> Descargar
+                        </Button>
+                      </div>
                     </div>
                   </Card.Body>
                 </Card>
@@ -222,6 +238,21 @@ const MisManuales = () => {
           </Row>
         )}
       </Container>
+
+      <Modal show={showPreview} onHide={() => { setShowPreview(false); setPreviewUrl(''); }}
+        size="xl" centered style={{ maxHeight: '90vh' }}>
+        <Modal.Header closeButton style={{ borderBottom: 'none', padding: '15px 20px' }}>
+          <Modal.Title style={{ fontWeight: '700', fontSize: '1rem' }}>
+            <FiEye className="me-2" />Vista Previa del Documento
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: 0, height: '75vh' }}>
+          {previewUrl && (
+            <iframe src={previewUrl} title="Vista Previa"
+              style={{ width: '100%', height: '100%', border: 'none' }} />
+          )}
+        </Modal.Body>
+      </Modal>
 
       <ToastContainer position="bottom-right" />
     </div>

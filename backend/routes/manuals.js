@@ -125,9 +125,51 @@ router.get('/download/:filename', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Archivo no encontrado' });
     }
 
+    await pool.query(
+      'INSERT INTO activity_logs (user_id, manual_id, accion) VALUES ($1, $2, $3)',
+      [req.user.id, manual.id, 'download']
+    );
+
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'attachment; filename="' + manual.nombre_original + '"'
+    });
+    res.send(manual.archivo_buffer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: 'Error del servidor' });
+  }
+});
+
+router.get('/preview/:filename', auth, async (req, res) => {
+  try {
+    const { pool } = require('../config/db');
+    const { rows } = await pool.query('SELECT * FROM manuals WHERE archivo = $1', [req.params.filename]);
+    const manual = rows[0];
+
+    if (!manual) {
+      return res.status(404).json({ msg: 'Manual no encontrado' });
+    }
+
+    if (req.user.rol !== 'admin') {
+      const assignments = await pool.query('SELECT * FROM manual_assignments WHERE manual_id = $1 AND user_id = $2', [manual.id, req.user.id]);
+      if (assignments.rows.length === 0) {
+        return res.status(403).json({ msg: 'No tienes acceso a este manual' });
+      }
+    }
+
+    if (!manual.archivo_buffer) {
+      return res.status(404).json({ msg: 'Archivo no encontrado' });
+    }
+
+    await pool.query(
+      'INSERT INTO activity_logs (user_id, manual_id, accion) VALUES ($1, $2, $3)',
+      [req.user.id, manual.id, 'preview']
+    );
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename="' + manual.nombre_original + '"'
     });
     res.send(manual.archivo_buffer);
   } catch (error) {

@@ -90,7 +90,7 @@ const Login = () => {
               <small style={{ color: '#aaa' }}>
                 Fibextelecom - Valencia, Venezuela
               </small>
-              <p style={{ color: '#ccc', fontSize: '0.7rem', margin: '8px 0 0' }}>
+              <p style={{ color: '#999', fontSize: '0.75rem', margin: '8px 0 0' }}>
                 Elaborado por Paulimar
               </p>
             </div>

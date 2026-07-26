@@ -45,6 +45,16 @@ const initDB = async () => {
       )
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS activity_logs (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        manual_id INTEGER NOT NULL REFERENCES manuals(id),
+        accion VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     console.log('Base de datos PostgreSQL inicializada');
   } finally {
     client.release();

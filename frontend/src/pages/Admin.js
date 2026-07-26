@@ -12,7 +12,7 @@ import {
   FiSearch, FiPlus, FiCheck, FiLogOut, FiGrid,
   FiUser, FiShield, FiServer, FiWifi, FiDatabase,
   FiCpu, FiMonitor, FiHardDrive, FiActivity, FiGlobe, FiZap,
-  FiPrinter, FiBook, FiLock
+  FiPrinter, FiBook, FiLock, FiEye, FiClock
 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -39,6 +39,8 @@ const Admin = () => {
     nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas'
   });
   const [userFormManuals, setUserFormManuals] = useState([]);
+  const [activityStats, setActivityStats] = useState({ porUsuario: [], porManual: [] });
+  const [activityLogs, setActivityLogs] = useState([]);
 
   const categorias = [
     'Manuales', 'Instructivo'
@@ -53,12 +55,16 @@ const Admin = () => {
 
   const fetchData = async () => {
     try {
-      const [manualsRes, usersRes] = await Promise.all([
+      const [manualsRes, usersRes, statsRes, logsRes] = await Promise.all([
         API.get('/manuals/all'),
-        API.get('/auth/users')
+        API.get('/auth/users'),
+        API.get('/activity/stats'),
+        API.get('/activity/logs')
       ]);
       setManuals(manualsRes.data);
       setUsers(usersRes.data);
+      setActivityStats(statsRes.data);
+      setActivityLogs(logsRes.data);
     } catch (error) {
       toast.error('Error al cargar datos');
     } finally {
@@ -381,6 +387,7 @@ const Admin = () => {
             <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
               <Tab eventKey="manuales" title={<span><FiFileText className="me-1" /> Manuales</span>} />
               <Tab eventKey="usuarios" title={<span><FiUsers className="me-1" /> Usuarios</span>} />
+              <Tab eventKey="actividad" title={<span><FiActivity className="me-1" /> Actividad</span>} />
             </Tabs>
 
             {activeTab === 'manuales' && (
@@ -551,6 +558,134 @@ const Admin = () => {
                     })}
                   </tbody>
                 </Table>
+              </>
+            )}
+
+            {activeTab === 'actividad' && (
+              <>
+                <h5 style={{ fontWeight: '700', marginBottom: '20px' }}>
+                  <FiActivity className="me-2" />Actividad de Usuarios
+                </h5>
+
+                <Row className="mb-4">
+                  <Col md={6}>
+                    <Card style={{ border: 'none', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                      <Card.Body>
+                        <h6 style={{ fontWeight: '700', color: '#0a1628' }}>
+                          <FiUsers className="me-1" /> Por Usuario
+                        </h6>
+                        {activityStats.porUsuario.length === 0 ? (
+                          <p style={{ color: '#999' }}>Sin actividad aun</p>
+                        ) : (
+                          <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                            {activityStats.porUsuario.map((u) => (
+                              <div key={u.id} style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '10px', borderBottom: '1px solid #f0f0f0'
+                              }}>
+                                <div>
+                                  <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{u.nombre}</div>
+                                  <small style={{ color: '#888' }}>{u.email}</small>
+                                </div>
+                                <div className="text-end">
+                                  <Badge bg="info" style={{ borderRadius: '6px', marginRight: '4px' }}>
+                                    <FiEye className="me-1" />{u.previews} vista(s)
+                                  </Badge>
+                                  <Badge bg="success" style={{ borderRadius: '6px' }}>
+                                    <FiDownload className="me-1" />{u.descargas} desc.
+                                  </Badge>
+                                  {u.ultimo_acceso && (
+                                    <div><small style={{ color: '#aaa' }}><FiClock className="me-1" />{new Date(u.ultimo_acceso).toLocaleString('es-VE')}</small></div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  <Col md={6}>
+                    <Card style={{ border: 'none', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                      <Card.Body>
+                        <h6 style={{ fontWeight: '700', color: '#0a1628' }}>
+                          <FiFileText className="me-1" /> Por Manual
+                        </h6>
+                        {activityStats.porManual.length === 0 ? (
+                          <p style={{ color: '#999' }}>Sin actividad aun</p>
+                        ) : (
+                          <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                            {activityStats.porManual.map((m) => (
+                              <div key={m.id} style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '10px', borderBottom: '1px solid #f0f0f0'
+                              }}>
+                                <div>
+                                  <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{m.titulo}</div>
+                                  <Badge bg={getCategoriaColor(m.categoria)} style={{ fontSize: '0.65rem' }}>
+                                    {m.categoria}
+                                  </Badge>
+                                </div>
+                                <div className="text-end">
+                                  <Badge bg="info" style={{ borderRadius: '6px', marginRight: '4px' }}>
+                                    <FiEye className="me-1" />{m.previews}
+                                  </Badge>
+                                  <Badge bg="success" style={{ borderRadius: '6px' }}>
+                                    <FiDownload className="me-1" />{m.descargas}
+                                  </Badge>
+                                  <div><small style={{ color: '#aaa' }}>{m.usuarios_unicos} usuario(s) unico(s)</small></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+
+                <Card style={{ border: 'none', borderRadius: '12px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                  <Card.Body>
+                    <h6 style={{ fontWeight: '700', color: '#0a1628', marginBottom: '15px' }}>
+                      <FiClock className="me-1" /> Historial Reciente
+                    </h6>
+                    {activityLogs.length === 0 ? (
+                      <p style={{ color: '#999' }}>Sin registros de actividad</p>
+                    ) : (
+                      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                        <Table hover size="sm">
+                          <thead>
+                            <tr>
+                              <th>Usuario</th>
+                              <th>Manual</th>
+                              <th>Accion</th>
+                              <th>Fecha</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {activityLogs.map((log) => (
+                              <tr key={log.id}>
+                                <td>
+                                  <span style={{ fontWeight: '500' }}>{log.user_nombre}</span>
+                                  <br /><small style={{ color: '#888' }}>{log.user_email}</small>
+                                </td>
+                                <td>{log.manual_titulo} <Badge bg={getCategoriaColor(log.manual_categoria)} style={{ fontSize: '0.6rem' }}>{log.manual_categoria}</Badge></td>
+                                <td>
+                                  {log.accion === 'preview' ? (
+                                    <Badge bg="info"><FiEye className="me-1" />Vista previa</Badge>
+                                  ) : (
+                                    <Badge bg="success"><FiDownload className="me-1" />Descarga</Badge>
+                                  )}
+                                </td>
+                                <td><small>{new Date(log.created_at).toLocaleString('es-VE')}</small></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </Table>
+                      </div>
+                    )}
+                  </Card.Body>
+                </Card>
               </>
             )}
           </Card.Body>
