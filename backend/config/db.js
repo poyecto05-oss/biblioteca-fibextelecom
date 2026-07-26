@@ -1,72 +1,54 @@
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require('pg');
 
-const dbPath = path.join(__dirname, '..', 'biblioteca.db');
-
-let db = null;
-
-const getDb = () => db;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 const initDB = async () => {
-  const SQL = await initSqlJs();
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        rol VARCHAR(50) DEFAULT 'usuario',
+        departamento VARCHAR(255) DEFAULT 'Sistemas',
+        activo BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-  if (fs.existsSync(dbPath)) {
-    const buffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(buffer);
-  } else {
-    db = new SQL.Database();
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS manuals (
+        id SERIAL PRIMARY KEY,
+        titulo VARCHAR(255) NOT NULL,
+        descripcion TEXT DEFAULT '',
+        categoria VARCHAR(100) NOT NULL,
+        archivo VARCHAR(255) NOT NULL,
+        nombre_original VARCHAR(255) NOT NULL,
+        archivo_buffer BYTEA,
+        subido_por INTEGER NOT NULL REFERENCES users(id),
+        activo BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS manual_assignments (
+        id SERIAL PRIMARY KEY,
+        manual_id INTEGER NOT NULL REFERENCES manuals(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(manual_id, user_id)
+      )
+    `);
+
+    console.log('Base de datos PostgreSQL inicializada');
+  } finally {
+    client.release();
   }
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      nombre TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      rol TEXT DEFAULT 'usuario',
-      departamento TEXT DEFAULT 'Sistemas',
-      activo INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS manuals (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      titulo TEXT NOT NULL,
-      descripcion TEXT DEFAULT '',
-      categoria TEXT NOT NULL,
-      archivo TEXT NOT NULL,
-      nombre_original TEXT NOT NULL,
-      subido_por INTEGER NOT NULL,
-      activo INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (subido_por) REFERENCES users(id)
-    )
-  `);
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS manual_assignments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      manual_id INTEGER NOT NULL,
-      user_id INTEGER NOT NULL,
-      FOREIGN KEY (manual_id) REFERENCES manuals(id) ON DELETE CASCADE,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      UNIQUE(manual_id, user_id)
-    )
-  `);
-
-  saveDB();
-  console.log('Base de datos SQLite inicializada');
-  return db;
 };
 
-const saveDB = () => {
-  if (!db) return;
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
-};
-
-module.exports = { initDB, getDb, saveDB };
+module.exports = { pool, initDB };

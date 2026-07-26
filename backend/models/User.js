@@ -1,82 +1,50 @@
-const { getDb, saveDB } = require('../config/db');
-
-function rowsToArray(results) {
-  if (!results || results.length === 0) return [];
-  const result = results[0];
-  if (!result || !result.values || result.values.length === 0) return [];
-  const columns = result.columns;
-  return result.values.map(row => {
-    const obj = {};
-    columns.forEach((col, i) => { obj[col] = row[i]; });
-    return obj;
-  });
-}
-
-function rowToObj(results) {
-  const rows = rowsToArray(results);
-  return rows.length > 0 ? rows[0] : null;
-}
+const { pool } = require('../config/db');
 
 const User = {
-  findById(id) {
-    const db = getDb();
-    return rowToObj(db.exec('SELECT * FROM users WHERE id = ?', [id]));
+  async findById(id) {
+    const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+    return rows[0] || null;
   },
 
-  findByEmail(email) {
-    const db = getDb();
-    return rowToObj(db.exec('SELECT * FROM users WHERE email = ?', [email]));
+  async findByEmail(email) {
+    const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    return rows[0] || null;
   },
 
-  findAll() {
-    const db = getDb();
-    return rowsToArray(db.exec('SELECT id, nombre, email, rol, departamento, activo, created_at FROM users ORDER BY nombre'));
+  async findAll() {
+    const { rows } = await pool.query('SELECT id, nombre, email, rol, departamento, activo, created_at FROM users ORDER BY nombre');
+    return rows;
   },
 
-  create({ nombre, email, password, rol, departamento }) {
-    const db = getDb();
-    const stmt = db.prepare(
-      'INSERT INTO users (nombre, email, password, rol, departamento) VALUES (?, ?, ?, ?, ?)'
+  async create({ nombre, email, password, rol, departamento }) {
+    const { rows } = await pool.query(
+      'INSERT INTO users (nombre, email, password, rol, departamento) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [nombre, email, password, rol || 'usuario', departamento || 'Sistemas']
     );
-    stmt.run([nombre, email, password, rol || 'usuario', departamento || 'Sistemas']);
-    const lastId = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
-    stmt.free();
-    saveDB();
-    return this.findById(lastId);
+    return rows[0];
   },
 
-  update(id, data) {
-    const db = getDb();
+  async update(id, data) {
     const fields = [];
     const values = [];
+    let i = 1;
 
-    if (data.nombre !== undefined) { fields.push('nombre = ?'); values.push(data.nombre); }
-    if (data.email !== undefined) { fields.push('email = ?'); values.push(data.email); }
-    if (data.password !== undefined) { fields.push('password = ?'); values.push(data.password); }
-    if (data.rol !== undefined) { fields.push('rol = ?'); values.push(data.rol); }
-    if (data.departamento !== undefined) { fields.push('departamento = ?'); values.push(data.departamento); }
-    if (data.activo !== undefined) { fields.push('activo = ?'); values.push(data.activo ? 1 : 0); }
+    if (data.nombre !== undefined) { fields.push(`nombre = $${i++}`); values.push(data.nombre); }
+    if (data.email !== undefined) { fields.push(`email = $${i++}`); values.push(data.email); }
+    if (data.password !== undefined) { fields.push(`password = $${i++}`); values.push(data.password); }
+    if (data.rol !== undefined) { fields.push(`rol = $${i++}`); values.push(data.rol); }
+    if (data.departamento !== undefined) { fields.push(`departamento = $${i++}`); values.push(data.departamento); }
+    if (data.activo !== undefined) { fields.push(`activo = $${i++}`); values.push(data.activo); }
 
     if (fields.length === 0) return this.findById(id);
 
     values.push(id);
-    const stmt = db.prepare(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`);
-    stmt.run(values);
-    stmt.free();
-    saveDB();
-    return this.findById(id);
+    const { rows } = await pool.query(`UPDATE users SET ${fields.join(', ')} WHERE id = $${i} RETURNING *`, values);
+    return rows[0];
   },
 
-  delete(id) {
-    const db = getDb();
-    db.run('DELETE FROM users WHERE id = ?', [id]);
-    saveDB();
-  },
-
-  toJSON(user) {
-    if (!user) return null;
-    const { password, ...rest } = user;
-    return rest;
+  async delete(id) {
+    await pool.query('DELETE FROM users WHERE id = $1', [id]);
   }
 };
 

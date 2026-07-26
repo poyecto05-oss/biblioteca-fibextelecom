@@ -9,7 +9,7 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = User.findByEmail(email);
+    const user = await User.findByEmail(email);
     if (!user) {
       return res.status(400).json({ msg: 'Credenciales incorrectas' });
     }
@@ -45,9 +45,9 @@ router.get('/me', auth, (req, res) => {
   res.json(req.user);
 });
 
-router.get('/users', auth, adminAuth, (req, res) => {
+router.get('/users', auth, adminAuth, async (req, res) => {
   try {
-    const users = User.findAll();
+    const users = await User.findAll();
     res.json(users);
   } catch (error) {
     res.status(500).json({ msg: 'Error del servidor' });
@@ -58,7 +58,7 @@ router.post('/users', auth, adminAuth, async (req, res) => {
   try {
     const { nombre, email, password, rol, departamento } = req.body;
 
-    const existing = User.findByEmail(email);
+    const existing = await User.findByEmail(email);
     if (existing) {
       return res.status(400).json({ msg: 'El email ya esta registrado' });
     }
@@ -66,7 +66,7 @@ router.post('/users', auth, adminAuth, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = User.create({
+    const user = await User.create({
       nombre,
       email,
       password: hashedPassword,
@@ -74,7 +74,8 @@ router.post('/users', auth, adminAuth, async (req, res) => {
       departamento: departamento || 'Sistemas'
     });
 
-    res.json({ user: User.toJSON(user) });
+    const { password: _, ...userSafe } = user;
+    res.json({ user: userSafe });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
@@ -91,17 +92,18 @@ router.put('/users/:id', auth, adminAuth, async (req, res) => {
       updateData.password = await bcrypt.hash(password, salt);
     }
 
-    const user = User.update(req.params.id, updateData);
-    res.json(User.toJSON(user));
+    const user = await User.update(req.params.id, updateData);
+    const { password: _, ...userSafe } = user;
+    res.json(userSafe);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.delete('/users/:id', auth, adminAuth, (req, res) => {
+router.delete('/users/:id', auth, adminAuth, async (req, res) => {
   try {
-    User.delete(req.params.id);
+    await User.delete(req.params.id);
     res.json({ msg: 'Usuario eliminado' });
   } catch (error) {
     res.status(500).json({ msg: 'Error del servidor' });

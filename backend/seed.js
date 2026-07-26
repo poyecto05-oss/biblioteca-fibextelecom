@@ -1,14 +1,14 @@
 require('dotenv').config();
-const { initDB } = require('./config/db');
+const { initDB, pool } = require('./config/db');
 const bcrypt = require('bcryptjs');
-const User = require('./models/User');
 
 const seedAdmin = async () => {
   try {
     await initDB();
+    console.log('Conectado a PostgreSQL');
 
-    const existing = User.findByEmail('admin@fibextelecom.com');
-    if (existing) {
+    const existing = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@fibextelecom.com']);
+    if (existing.rows.length > 0) {
       console.log('El admin ya existe');
       process.exit(0);
     }
@@ -16,13 +16,10 @@ const seedAdmin = async () => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('admin123', salt);
 
-    const admin = User.create({
-      nombre: 'Administrador Sistemas',
-      email: 'admin@fibextelecom.com',
-      password: hashedPassword,
-      rol: 'admin',
-      departamento: 'Sistemas'
-    });
+    await pool.query(
+      'INSERT INTO users (nombre, email, password, rol, departamento) VALUES ($1, $2, $3, $4, $5)',
+      ['Administrador Sistemas', 'admin@fibextelecom.com', hashedPassword, 'admin', 'Sistemas']
+    );
 
     console.log('Admin creado exitosamente:');
     console.log('  Email: admin@fibextelecom.com');

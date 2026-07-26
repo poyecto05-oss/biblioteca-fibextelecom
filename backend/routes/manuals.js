@@ -1,59 +1,54 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const Manual = require('../models/Manual');
 const { auth, adminAuth } = require('../middleware/auth');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'application/pdf') {
-    cb(null, true);
-  } else {
-    cb(new Error('Solo se permiten archivos PDF'), false);
-  }
-};
-
 const upload = multer({
-  storage,
-  fileFilter,
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos PDF'), false);
+    }
+  },
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-router.get('/', auth, (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     let manuals;
     if (req.user.rol === 'admin') {
-      manuals = Manual.findAll();
+      manuals = await Manual.findAll();
     } else {
-      manuals = Manual.findByUser(req.user.id);
+      manuals = await Manual.findByUser(req.user.id);
     }
-    res.json(manuals);
+    const safe = manuals.map(m => {
+      const { archivo_buffer, ...rest } = m;
+      return rest;
+    });
+    res.json(safe);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.get('/all', auth, adminAuth, (req, res) => {
+router.get('/all', auth, adminAuth, async (req, res) => {
   try {
-    const manuals = Manual.findAllIncludingInactive();
-    res.json(manuals);
+    const manuals = await Manual.findAllIncludingInactive();
+    const safe = manuals.map(m => {
+      const { archivo_buffer, ...rest } = m;
+      return rest;
+    });
+    res.json(safe);
   } catch (error) {
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.post('/', auth, adminAuth, upload.single('archivo'), (req, res) => {
+router.post('/', auth, adminAuth, upload.single('archivo'), async (req, res) => {
   try {
     const { titulo, descripcion, categoria, asignados } = req.body;
 
@@ -61,29 +56,28 @@ router.post('/', auth, adminAuth, upload.single('archivo'), (req, res) => {
       return res.status(400).json({ msg: 'El archivo PDF es obligatorio' });
     }
 
-    let parsedAsignados = [];
-    if (asignados) {
-      parsedAsignados = JSON.parse(asignados);
-    }
+    const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.pdf';
 
-    const manual = Manual.create({
+    const manual = await Manual.create({
       titulo,
-      descripcion,
+      descripcion: descripcion || '',
       categoria,
-      archivo: req.file.filename,
+      archivo: filename,
       nombreOriginal: req.file.originalname,
+      archivoBuffer: req.file.buffer,
       subidoPor: req.user.id,
-      asignados: parsedAsignados
+      asignados: asignados ? JSON.parse(asignados) : []
     });
 
-    res.json(manual);
+    const { archivo_buffer, ...rest } = manual;
+    res.json(rest);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.put('/:id', auth, adminAuth, (req, res) => {
+router.put('/:id', auth, adminAuth, async (req, res) => {
   try {
     const { titulo, descripcion, categoria, asignados } = req.body;
     const updateData = { titulo, descripcion, categoria };
@@ -92,36 +86,52 @@ router.put('/:id', auth, adminAuth, (req, res) => {
       updateData.asignados = JSON.parse(asignados);
     }
 
-    const manual = Manual.update(req.params.id, updateData);
-    res.json(manual);
+    const manual = await Manual.update(req.params.id, updateData);
+    const { archivo_buffer, ...rest } = manual;
+    res.json(rest);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.delete('/:id', auth, adminAuth, (req, res) => {
+router.delete('/:id', auth, adminAuth, async (req, res) => {
   try {
-    Manual.delete(req.params.id);
+    await Manual.delete(req.params.id);
     res.json({ msg: 'Manual eliminado' });
   } catch (error) {
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
 
-router.get('/download/:filename', auth, (req, res) => {
+router.get('/download/:filename', auth, async (req, res) => {
   try {
-    const filePath = path.join(__dirname, '..', 'uploads', req.params.filename);
+    const { pool } = require('../config/db');
+    const { rows } = await pool.query('SELECT * FROM manuals WHERE archivo = $1', [req.params.filename]);
+    const manual = rows[0];
+
+    if (!manual) {
+      return res.status(404).json({ msg: 'Manual no encontrado' });
+    }
 
     if (req.user.rol !== 'admin') {
-      const manual = Manual.findByUser(req.user.id).find(m => m.archivo === req.params.filename);
-      if (!manual) {
+      const assignments = await pool.query('SELECT * FROM manual_assignments WHERE manual_id = $1 AND user_id = $2', [manual.id, req.user.id]);
+      if (assignments.rows.length === 0) {
         return res.status(403).json({ msg: 'No tienes acceso a este manual' });
       }
     }
 
-    res.download(filePath);
+    if (!manual.archivo_buffer) {
+      return res.status(404).json({ msg: 'Archivo no encontrado' });
+    }
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="' + manual.nombre_original + '"'
+    });
+    res.send(manual.archivo_buffer);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ msg: 'Error del servidor' });
   }
 });
