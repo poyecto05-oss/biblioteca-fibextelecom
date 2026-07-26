@@ -44,8 +44,8 @@ const Login = () => {
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <img src="/logo-fibex.jpg" alt="Fibex Telecom"
-                style={{ width: '220px', marginBottom: '15px', borderRadius: '8px' }} />
-              <h3 style={{ fontWeight: '700', color: '#0a1628', fontSize: '1.25rem' }}>
+                style={{ width: '130px', marginBottom: '12px', borderRadius: '8px' }} />
+              <h3 style={{ fontWeight: '700', color: '#0a1628', fontSize: '1.15rem' }}>
                 Biblioteca de Manuales
               </h3>
               <p style={{ color: '#888', fontSize: '0.85rem', margin: 0 }}>
@@ -90,6 +90,9 @@ const Login = () => {
               <small style={{ color: '#aaa' }}>
                 Fibextelecom - Valencia, Venezuela
               </small>
+              <p style={{ color: '#ccc', fontSize: '0.7rem', margin: '8px 0 0' }}>
+                Elaborado por Paulimar
+              </p>
             </div>
           </Card.Body>
         </Card>

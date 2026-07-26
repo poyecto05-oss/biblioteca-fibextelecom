@@ -114,6 +114,9 @@ const MisManuales = () => {
                 <small style={{ color: 'rgba(255,255,255,0.5)' }}>
                   <FiShield className="me-1" />Departamento de Sistemas
                 </small>
+                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', marginTop: '2px' }}>
+                  Elaborado por Paulimar
+                </div>
               </div>
             </div>
             <div className="d-flex align-items-center gap-3">

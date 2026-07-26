@@ -6,3 +6,5 @@ backend/*.db
 *.log
 .env
 frontend/build/
+
+.vercel

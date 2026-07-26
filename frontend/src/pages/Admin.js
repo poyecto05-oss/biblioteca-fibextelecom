@@ -38,6 +38,7 @@ const Admin = () => {
   const [userForm, setUserForm] = useState({
     nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas'
   });
+  const [userFormManuals, setUserFormManuals] = useState([]);
 
   const categorias = [
     'Manuales', 'Instructivo'
@@ -96,18 +97,41 @@ const Admin = () => {
   const handleSaveUser = async (e) => {
     e.preventDefault();
     try {
+      var savedUserId;
       if (editingUser) {
         const updateData = { ...userForm };
         if (!updateData.password) delete updateData.password;
         await API.put("/auth/users/" + editingUser.id, updateData);
+        savedUserId = editingUser.id;
         toast.success('Usuario actualizado');
       } else {
-        await API.post('/auth/users', userForm);
+        const res = await API.post('/auth/users', userForm);
+        savedUserId = res.data.user?.id;
         toast.success('Usuario creado exitosamente');
       }
+
+      if (savedUserId && userForm.rol !== 'admin') {
+        for (const manual of manuals) {
+          var wasAssigned = manual.asignados && manual.asignados.some(function(a) { return a.id === savedUserId; });
+          var shouldAssign = userFormManuals.includes(manual.id);
+          if (wasAssigned !== shouldAssign) {
+            var updatedAsignados = shouldAssign
+              ? (manual.asignados || []).map(function(a) { return a.id; }).concat([savedUserId])
+              : (manual.asignados || []).filter(function(a) { return a.id !== savedUserId; });
+            await API.put("/manuals/" + manual.id, {
+              titulo: manual.titulo,
+              descripcion: manual.descripcion,
+              categoria: manual.categoria,
+              asignados: JSON.stringify(updatedAsignados)
+            });
+          }
+        }
+      }
+
       setShowUserModal(false);
       setEditingUser(null);
       setUserForm({ nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas' });
+      setUserFormManuals([]);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.msg || 'Error al guardar usuario');
@@ -228,6 +252,10 @@ const Admin = () => {
       nombre: u.nombre, email: u.email, password: '',
       rol: u.rol, departamento: u.departamento
     });
+    var assignedIds = manuals
+      .filter(function(m) { return m.asignados && m.asignados.some(function(a) { return a.id === u.id; }); })
+      .map(function(m) { return m.id; });
+    setUserFormManuals(assignedIds);
     setShowUserModal(true);
   };
 
@@ -301,6 +329,9 @@ const Admin = () => {
                 <small style={{ color: 'rgba(255,255,255,0.6)' }}>
                   <FiCpu className="me-1" />Departamento de Sistemas
                 </small>
+                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', marginTop: '2px' }}>
+                  Elaborado por Paulimar
+                </div>
               </div>
             </div>
             <div className="d-flex align-items-center gap-3">
@@ -443,6 +474,7 @@ const Admin = () => {
                     <Button onClick={() => {
                       setEditingUser(null);
                       setUserForm({ nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas' });
+                      setUserFormManuals([]);
                       setShowUserModal(true);
                     }} style={{
                       background: 'linear-gradient(135deg, #00aa66, #00cc88)',
@@ -583,7 +615,7 @@ const Admin = () => {
         </Form>
       </Modal>
 
-      <Modal show={showUserModal} onHide={() => { setShowUserModal(false); setEditingUser(null); }} centered>
+      <Modal show={showUserModal} onHide={() => { setShowUserModal(false); setEditingUser(null); setUserFormManuals([]); }} centered>
         <Modal.Header closeButton style={{ borderBottom: 'none', padding: '20px 25px' }}>
           <Modal.Title style={{ fontWeight: '700' }}>
             <FiUsers className="me-2" />
@@ -637,9 +669,41 @@ const Admin = () => {
                 </Form.Group>
               </Col>
             </Row>
+            {userForm.rol !== 'admin' && (
+              <Form.Group className="mb-3">
+                <Form.Label style={{ fontWeight: '600' }}>
+                  <FiFileText className="me-1" /> Manuales asignados
+                </Form.Label>
+                <div style={{ border: '1px solid #e0e0e0', borderRadius: '10px', padding: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                  {manuals.filter(function(m) { return m.activo === 1 || m.activo === true; }).map((m) => (
+                    <div key={m.id} onClick={() => {
+                      setUserFormManuals(function(prev) {
+                        return prev.includes(m.id) ? prev.filter(function(id) { return id !== m.id; }) : prev.concat([m.id]);
+                      });
+                    }} style={{
+                      display: 'flex', alignItems: 'center', padding: '8px 10px',
+                      marginBottom: '4px', borderRadius: '8px',
+                      border: userFormManuals.includes(m.id) ? '2px solid #0066cc' : '1px solid #eee',
+                      background: userFormManuals.includes(m.id) ? '#f0f7ff' : 'white',
+                      cursor: 'pointer', transition: 'all 0.2s'
+                    }}>
+                      <input type="checkbox" checked={userFormManuals.includes(m.id)} readOnly style={{ marginRight: '10px' }} />
+                      <span style={{ fontWeight: '500', fontSize: '0.9rem' }}>{m.titulo}</span>
+                      <Badge bg={getCategoriaColor(m.categoria)} style={{ marginLeft: '8px', fontSize: '0.65rem' }}>
+                        {m.categoria}
+                      </Badge>
+                    </div>
+                  ))}
+                  {manuals.filter(function(m) { return m.activo === 1 || m.activo === true; }).length === 0 && (
+                    <p style={{ color: '#999', textAlign: 'center', margin: 0 }}>No hay manuales disponibles</p>
+                  )}
+                </div>
+                <small style={{ color: '#888' }}>{userFormManuals.length} manual(es) seleccionado(s)</small>
+              </Form.Group>
+            )}
           </Modal.Body>
           <Modal.Footer style={{ borderTop: 'none', padding: '15px 25px' }}>
-            <Button variant="secondary" onClick={() => { setShowUserModal(false); setEditingUser(null); }}
+            <Button variant="secondary" onClick={() => { setShowUserModal(false); setEditingUser(null); setUserFormManuals([]); }}
               style={{ borderRadius: '8px' }}>Cancelar</Button>
             <Button type="submit" style={{
               background: 'linear-gradient(135deg, #00aa66, #00cc88)',
