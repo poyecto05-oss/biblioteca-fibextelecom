@@ -6,7 +6,7 @@
     "dev": "cd backend && node server.js",
     "build": "cd frontend && npm install && npm run build",
     "start": "cd backend && node server.js",
-    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "install:all": "npm install && cd frontend && npm install",
     "seed": "cd backend && node seed.js"
   },
   "dependencies": {
