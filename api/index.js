@@ -1,4 +1,3 @@
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const express = require('express');
 const cors = require('cors');
 const { initDB } = require('../backend/config/db');
@@ -15,12 +14,16 @@ app.get('/api/health', (req, res) => {
   res.json({ msg: 'Biblioteca Fibextelecom - Sistema activo' });
 });
 
-let connected = false;
+let dbReady = false;
 
 module.exports = async (req, res) => {
-  if (!connected) {
-    await initDB();
-    connected = true;
+  if (!dbReady) {
+    try {
+      await initDB();
+      dbReady = true;
+    } catch (err) {
+      console.error('DB init error:', err);
+    }
   }
   return app(req, res);
 };
