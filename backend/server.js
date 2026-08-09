@@ -12,6 +12,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/manuals', require('./routes/manuals'));
 app.use('/api/activity', require('./routes/activity'));
+app.use('/api/folders', require('./routes/folders'));
 
 app.get('/api/health', (req, res) => {
   res.json({ msg: 'Biblioteca Fibextelecom - Sistema activo' });

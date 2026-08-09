@@ -50,7 +50,7 @@ router.get('/all', auth, adminAuth, async (req, res) => {
 
 router.post('/', auth, adminAuth, upload.single('archivo'), async (req, res) => {
   try {
-    const { titulo, descripcion, categoria, asignados } = req.body;
+    const { titulo, descripcion, categoria, asignados, folder_id } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ msg: 'El archivo PDF es obligatorio' });
@@ -66,7 +66,8 @@ router.post('/', auth, adminAuth, upload.single('archivo'), async (req, res) => 
       nombreOriginal: req.file.originalname,
       archivoBuffer: req.file.buffer,
       subidoPor: req.user.id,
-      asignados: asignados ? JSON.parse(asignados) : []
+      asignados: asignados ? JSON.parse(asignados) : [],
+      folderId: folder_id || null
     });
 
     const { archivo_buffer, ...rest } = manual;
@@ -79,8 +80,8 @@ router.post('/', auth, adminAuth, upload.single('archivo'), async (req, res) => 
 
 router.put('/:id', auth, adminAuth, async (req, res) => {
   try {
-    const { titulo, descripcion, categoria, asignados } = req.body;
-    const updateData = { titulo, descripcion, categoria };
+    const { titulo, descripcion, categoria, asignados, folder_id } = req.body;
+    const updateData = { titulo, descripcion, categoria, folderId: folder_id };
 
     if (asignados !== undefined) {
       updateData.asignados = JSON.parse(asignados);
@@ -116,7 +117,10 @@ router.get('/download/:filename', auth, async (req, res) => {
 
     if (req.user.rol !== 'admin') {
       const assignments = await pool.query('SELECT * FROM manual_assignments WHERE manual_id = $1 AND user_id = $2', [manual.id, req.user.id]);
-      if (assignments.rows.length === 0) {
+      const folderAccess = manual.folder_id
+        ? (await pool.query('SELECT * FROM folder_assignments WHERE folder_id = $1 AND user_id = $2', [manual.folder_id, req.user.id])).rows.length > 0
+        : false;
+      if (assignments.rows.length === 0 && !folderAccess) {
         return res.status(403).json({ msg: 'No tienes acceso a este manual' });
       }
     }
@@ -153,7 +157,10 @@ router.get('/preview/:filename', auth, async (req, res) => {
 
     if (req.user.rol !== 'admin') {
       const assignments = await pool.query('SELECT * FROM manual_assignments WHERE manual_id = $1 AND user_id = $2', [manual.id, req.user.id]);
-      if (assignments.rows.length === 0) {
+      const folderAccess = manual.folder_id
+        ? (await pool.query('SELECT * FROM folder_assignments WHERE folder_id = $1 AND user_id = $2', [manual.folder_id, req.user.id])).rows.length > 0
+        : false;
+      if (assignments.rows.length === 0 && !folderAccess) {
         return res.status(403).json({ msg: 'No tienes acceso a este manual' });
       }
     }

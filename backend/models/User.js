@@ -44,6 +44,8 @@ const User = {
   },
 
   async delete(id) {
+    await pool.query('DELETE FROM activity_logs WHERE user_id = $1', [id]);
+    await pool.query('DELETE FROM folder_assignments WHERE user_id = $1', [id]);
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
   }
 };

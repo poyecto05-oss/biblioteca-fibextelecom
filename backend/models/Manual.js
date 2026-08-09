@@ -30,9 +30,10 @@ const Manual = {
 
   async findByUser(userId) {
     const { rows } = await pool.query(`
-      SELECT m.* FROM manuals m
-      INNER JOIN manual_assignments ma ON m.id = ma.manual_id
-      WHERE ma.user_id = $1 AND m.activo = true
+      SELECT DISTINCT m.* FROM manuals m
+      LEFT JOIN manual_assignments ma ON m.id = ma.manual_id AND ma.user_id = $1
+      LEFT JOIN folder_assignments fa ON m.folder_id = fa.folder_id AND fa.user_id = $1
+      WHERE m.activo = true AND (ma.id IS NOT NULL OR fa.id IS NOT NULL)
       ORDER BY m.created_at DESC
     `, [userId]);
     return Promise.all(rows.map(async m => {
@@ -52,10 +53,10 @@ const Manual = {
     return rows;
   },
 
-  async create({ titulo, descripcion, categoria, archivo, nombreOriginal, subidoPor, asignados, archivoBuffer }) {
+  async create({ titulo, descripcion, categoria, archivo, nombreOriginal, subidoPor, asignados, archivoBuffer, folderId }) {
     const { rows } = await pool.query(
-      'INSERT INTO manuals (titulo, descripcion, categoria, archivo, nombre_original, archivo_buffer, subido_por) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-      [titulo, descripcion || '', categoria, archivo, nombreOriginal, archivoBuffer, subidoPor]
+      'INSERT INTO manuals (titulo, descripcion, categoria, archivo, nombre_original, archivo_buffer, subido_por, folder_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [titulo, descripcion || '', categoria, archivo, nombreOriginal, archivoBuffer, subidoPor, folderId || null]
     );
     const manual = rows[0];
 
@@ -75,6 +76,7 @@ const Manual = {
     if (data.descripcion !== undefined) { fields.push(`descripcion = $${i++}`); values.push(data.descripcion); }
     if (data.categoria !== undefined) { fields.push(`categoria = $${i++}`); values.push(data.categoria); }
     if (data.activo !== undefined) { fields.push(`activo = $${i++}`); values.push(data.activo); }
+    if (data.folderId !== undefined) { fields.push(`folder_id = $${i++}`); values.push(data.folderId || null); }
 
     if (fields.length > 0) {
       values.push(id);
@@ -98,6 +100,7 @@ const Manual = {
   },
 
   async delete(id) {
+    await pool.query('DELETE FROM activity_logs WHERE manual_id = $1', [id]);
     await pool.query('DELETE FROM manual_assignments WHERE manual_id = $1', [id]);
     await pool.query('DELETE FROM manuals WHERE id = $1', [id]);
   }

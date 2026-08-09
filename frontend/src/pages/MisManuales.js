@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import API from '../api';
-import { Container, Row, Col, Card, Badge, Form, InputGroup, Button, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Form, InputGroup, Button, Modal, Tabs, Tab } from 'react-bootstrap';
 import {
   FiFileText, FiDownload, FiSearch, FiUser, FiGrid,
   FiServer, FiWifi, FiShield, FiDatabase, FiCpu,
   FiMonitor, FiHardDrive, FiActivity, FiGlobe, FiZap,
-  FiLogOut, FiEye
+  FiLogOut, FiEye, FiFolder
 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -22,18 +22,65 @@ const catColors = {
   'Instructivo': '#00aa66'
 };
 
+const ManualCard = ({ manual, onPreview, onDownload, catColors, catIcons, getCategoriaColor }) => (
+  <Col lg={4} md={6} key={manual.id} className="mb-4">
+    <Card style={{
+      height: '100%', border: 'none', borderRadius: '16px',
+      boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+      transition: 'transform 0.2s, box-shadow 0.2s'
+    }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)'; }}
+    >
+      <Card.Body className="d-flex flex-column">
+        <div className="d-flex justify-content-between align-items-start mb-3">
+          <div style={{
+            width: '48px', height: '48px',
+            background: 'linear-gradient(135deg, ' + (catColors[manual.categoria] || '#0066cc') + ', ' + (catColors[manual.categoria] || '#0066cc') + '99)',
+            borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            {catIcons[manual.categoria] || <FiFileText size={24} color="white" />}
+          </div>
+          <Badge bg={getCategoriaColor(manual.categoria)}
+            style={{ fontSize: '0.7rem', padding: '5px 8px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {catIcons[manual.categoria]} {manual.categoria}
+          </Badge>
+        </div>
+        <h5 style={{ fontWeight: '700', color: '#0a1628' }}>{manual.titulo}</h5>
+        <p style={{ color: '#666', fontSize: '0.85rem', flex: 1 }}>{manual.descripcion || 'Sin descripcion'}</p>
+        <div className="d-flex justify-content-between align-items-center mt-3 pt-3" style={{ borderTop: '1px solid #eee' }}>
+          <small style={{ color: '#999' }}><FiActivity className="me-1" />{new Date(manual.created_at).toLocaleDateString('es-VE')}</small>
+          <div className="d-flex gap-2">
+            <Button variant="outline-secondary" size="sm"
+              onClick={() => onPreview(manual.archivo)}
+              style={{ borderRadius: '8px', padding: '6px 12px' }}>
+              <FiEye className="me-1" /> Ver
+            </Button>
+            <Button variant="outline-primary" size="sm"
+              onClick={() => onDownload(manual.archivo, manual.titulo)}
+              style={{ borderRadius: '8px', padding: '6px 12px' }}>
+              <FiDownload className="me-1" /> Descargar
+            </Button>
+          </div>
+        </div>
+      </Card.Body>
+    </Card>
+  </Col>
+);
+
 const MisManuales = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [manuals, setManuals] = useState([]);
   const [filtered, setFiltered] = useState([]);
+  const [misCarpetas, setMisCarpetas] = useState([]);
   const [search, setSearch] = useState('');
-  const [categoria, setCategoria] = useState('Todas');
+  const [categoria, setCategoria] = useState('Manuales');
   const [loading, setLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
 
-  const categorias = ['Todas', 'Manuales', 'Instructivo'];
+  const categorias = ['Manuales', 'Instructivo'];
 
   useEffect(() => { fetchManuals(); }, []);
 
@@ -53,9 +100,13 @@ const MisManuales = () => {
 
   const fetchManuals = async () => {
     try {
-      const res = await API.get('/manuals');
+      const [res, carpetasRes] = await Promise.all([
+        API.get('/manuals'),
+        API.get('/folders/mis-carpetas')
+      ]);
       setManuals(res.data);
       setFiltered(res.data);
+      setMisCarpetas(carpetasRes.data || []);
     } catch (error) {
       toast.error('Error al cargar manuales');
     } finally {
@@ -152,90 +203,96 @@ const MisManuales = () => {
       </div>
 
       <Container className="py-4">
-        <Row className="mb-4">
-          <Col md={8}>
-            <InputGroup style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              <InputGroup.Text style={{ background: 'white', border: 'none', paddingLeft: '20px' }}>
-                <FiSearch />
-              </InputGroup.Text>
-              <Form.Control placeholder="Buscar manuales por titulo o descripcion..."
-                value={search} onChange={(e) => setSearch(e.target.value)}
-                style={{ border: 'none', padding: '12px 15px', fontSize: '0.95rem' }} />
-            </InputGroup>
-          </Col>
-          <Col md={4}>
-            <Form.Select value={categoria} onChange={(e) => setCategoria(e.target.value)}
-              style={{ borderRadius: '12px', border: 'none', padding: '12px 15px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-              {categorias.map(c => <option key={c} value={c}>{c === 'Todas' ? 'Todas las categorias' : c}</option>)}
-            </Form.Select>
-          </Col>
-        </Row>
+        <InputGroup className="mb-4" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+          <InputGroup.Text style={{ background: 'white', border: 'none', paddingLeft: '20px' }}>
+            <FiSearch />
+          </InputGroup.Text>
+          <Form.Control placeholder="Buscar manuales por titulo o descripcion..."
+            value={search} onChange={(e) => setSearch(e.target.value)}
+            style={{ border: 'none', padding: '12px 15px', fontSize: '0.95rem' }} />
+        </InputGroup>
+
+        <Tabs activeKey={categoria} onSelect={(k) => setCategoria(k)} className="mb-4" style={{ fontWeight: '600' }}>
+          {categorias.map(c => (
+            <Tab key={c} eventKey={c} title={<span>{catIcons[c] || <FiFileText size={14} />} {c}</span>} />
+          ))}
+        </Tabs>
 
         <div className="mb-3 d-flex align-items-center gap-2">
           <FiFileText className="text-muted" />
-          <small className="text-muted">{filtered.length} manual(es) asignado(s) a ti</small>
+          <small className="text-muted">{filtered.length} manual(es) disponibles para ti</small>
         </div>
 
         {filtered.length === 0 ? (
           <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', textAlign: 'center', padding: '60px 20px' }}>
             <FiServer size={60} color="#ccc" />
             <h4 className="mt-3" style={{ color: '#666' }}>
-              No hay manuales {search || categoria !== 'Todas' ? 'con estos filtros' : 'asignados'}
+              No hay manuales {search ? 'con estos filtros' : 'en ' + categoria}
             </h4>
             <p style={{ color: '#999' }}>
-              {search || categoria !== 'Todas'
+              {search
                 ? 'Intenta con otros criterios de busqueda'
                 : 'Contacta al administrador para que te asigne manuales'}
             </p>
           </Card>
         ) : (
-          <Row>
-            {filtered.map((manual) => (
-              <Col lg={4} md={6} key={manual.id} className="mb-4">
-                <Card style={{
-                  height: '100%', border: 'none', borderRadius: '16px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
-                }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)'; }}
-                >
-                  <Card.Body className="d-flex flex-column">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div style={{
-                        width: '48px', height: '48px',
-                        background: 'linear-gradient(135deg, ' + (catColors[manual.categoria] || '#0066cc') + ', ' + (catColors[manual.categoria] || '#0066cc') + '99)',
-                        borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        {catIcons[manual.categoria] || <FiFileText size={24} color="white" />}
-                      </div>
-                      <Badge bg={getCategoriaColor(manual.categoria)}
-                        style={{ fontSize: '0.7rem', padding: '5px 8px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {catIcons[manual.categoria]} {manual.categoria}
-                      </Badge>
+          <>
+            {misCarpetas.map((folder) => {
+              var folderManuals = filtered.filter(function(m) { return m.folder_id === folder.id; });
+              if (folderManuals.length === 0) return null;
+              return (
+                <div key={folder.id} className="mb-4">
+                  <div className="d-flex align-items-center mb-3">
+                    <div style={{
+                      width: '36px', height: '36px',
+                      background: 'linear-gradient(135deg, #ff6600, #ff9900)',
+                      borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginRight: '12px'
+                    }}>
+                      <FiFolder size={20} color="white" />
                     </div>
-                    <h5 style={{ fontWeight: '700', color: '#0a1628' }}>{manual.titulo}</h5>
-                    <p style={{ color: '#666', fontSize: '0.85rem', flex: 1 }}>{manual.descripcion || 'Sin descripcion'}</p>
-                    <div className="d-flex justify-content-between align-items-center mt-3 pt-3" style={{ borderTop: '1px solid #eee' }}>
-                      <small style={{ color: '#999' }}><FiActivity className="me-1" />{new Date(manual.created_at).toLocaleDateString('es-VE')}</small>
-                      <div className="d-flex gap-2">
-                        <Button variant="outline-secondary" size="sm"
-                          onClick={() => handlePreview(manual.archivo)}
-                          style={{ borderRadius: '8px', padding: '6px 12px' }}>
-                          <FiEye className="me-1" /> Ver
-                        </Button>
-                        <Button variant="outline-primary" size="sm"
-                          onClick={() => handleDownload(manual.archivo, manual.titulo)}
-                          style={{ borderRadius: '8px', padding: '6px 12px' }}>
-                          <FiDownload className="me-1" /> Descargar
-                        </Button>
-                      </div>
+                    <div>
+                      <h5 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>{folder.nombre}</h5>
+                      <small style={{ color: '#888' }}>{folderManuals.length} manual(es)</small>
                     </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+                  </div>
+                  <Row>
+                    {folderManuals.map((manual) => (
+                      <ManualCard key={manual.id} manual={manual} onPreview={handlePreview} onDownload={handleDownload}
+                        catColors={catColors} catIcons={catIcons} getCategoriaColor={getCategoriaColor} />
+                    ))}
+                  </Row>
+                </div>
+              );
+            })}
+
+            {filtered.some(function(m) { return !m.folder_id; }) && (
+              <div className="mb-4">
+                <div className="d-flex align-items-center mb-3">
+                  <div style={{
+                    width: '36px', height: '36px',
+                    background: 'linear-gradient(135deg, #0066cc, #00aaff)',
+                    borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginRight: '12px'
+                  }}>
+                    <FiFileText size={20} color="white" />
+                  </div>
+                  <div>
+                    <h5 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>Sin carpeta</h5>
+                    <small style={{ color: '#888' }}>
+                      {filtered.filter(function(m) { return !m.folder_id; }).length} manual(es)
+                    </small>
+                  </div>
+                </div>
+                <Row>
+                  {filtered.filter(function(m) { return !m.folder_id; }).map((manual) => (
+                    <ManualCard key={manual.id} manual={manual} onPreview={handlePreview} onDownload={handleDownload}
+                      catColors={catColors} catIcons={catIcons} getCategoriaColor={getCategoriaColor} />
+                  ))}
+                </Row>
+              </div>
+            )}
+          </>
         )}
       </Container>
 

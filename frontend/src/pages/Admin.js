@@ -12,7 +12,7 @@ import {
   FiSearch, FiPlus, FiCheck, FiLogOut, FiGrid,
   FiUser, FiShield, FiServer, FiWifi, FiDatabase,
   FiCpu, FiMonitor, FiHardDrive, FiActivity, FiGlobe, FiZap,
-  FiPrinter, FiBook, FiLock, FiEye, FiClock
+  FiPrinter, FiBook, FiLock, FiEye, FiClock, FiFolder, FiFolderPlus
 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,7 +33,7 @@ const Admin = () => {
   const [selectedManuals, setSelectedManuals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [manualForm, setManualForm] = useState({
-    titulo: '', descripcion: '', categoria: 'Manuales', archivo: null
+    titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: ''
   });
   const [userForm, setUserForm] = useState({
     nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas'
@@ -41,6 +41,13 @@ const Admin = () => {
   const [userFormManuals, setUserFormManuals] = useState([]);
   const [activityStats, setActivityStats] = useState({ porUsuario: [], porManual: [] });
   const [activityLogs, setActivityLogs] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [showFolderModal, setShowFolderModal] = useState(false);
+  const [editingFolder, setEditingFolder] = useState(null);
+  const [folderForm, setFolderForm] = useState({ nombre: '', descripcion: '' });
+  const [showFolderAssignModal, setShowFolderAssignModal] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState(null);
+  const [selectedFolderUsers, setSelectedFolderUsers] = useState([]);
 
   const categorias = [
     'Manuales', 'Instructivo'
@@ -55,16 +62,18 @@ const Admin = () => {
 
   const fetchData = async () => {
     try {
-      const [manualsRes, usersRes, statsRes, logsRes] = await Promise.all([
+      const [manualsRes, usersRes, statsRes, logsRes, foldersRes] = await Promise.all([
         API.get('/manuals/all'),
         API.get('/auth/users'),
         API.get('/activity/stats'),
-        API.get('/activity/logs')
+        API.get('/activity/logs'),
+        API.get('/folders')
       ]);
       setManuals(manualsRes.data);
       setUsers(usersRes.data);
       setActivityStats(statsRes.data);
       setActivityLogs(logsRes.data);
+      setFolders(foldersRes.data);
     } catch (error) {
       toast.error('Error al cargar datos');
     } finally {
@@ -78,13 +87,15 @@ const Admin = () => {
     formData.append('titulo', manualForm.titulo);
     formData.append('descripcion', manualForm.descripcion);
     formData.append('categoria', manualForm.categoria);
+    if (manualForm.folder_id) formData.append('folder_id', manualForm.folder_id);
     if (manualForm.archivo) formData.append('archivo', manualForm.archivo);
     try {
       if (editingManual) {
         await API.put("/manuals/" + editingManual.id, {
           titulo: manualForm.titulo,
           descripcion: manualForm.descripcion,
-          categoria: manualForm.categoria
+          categoria: manualForm.categoria,
+          folder_id: manualForm.folder_id || null
         });
         toast.success('Manual actualizado');
       } else {
@@ -93,7 +104,7 @@ const Admin = () => {
       }
       setShowUploadModal(false);
       setEditingManual(null);
-      setManualForm({ titulo: '', descripcion: '', categoria: 'Redes', archivo: null });
+      setManualForm({ titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: '' });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.msg || 'Error al guardar manual');
@@ -195,6 +206,69 @@ const Admin = () => {
     }
   };
 
+  const handleSaveFolder = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingFolder) {
+        await API.put("/folders/" + editingFolder.id, folderForm);
+        toast.success('Carpeta actualizada');
+      } else {
+        await API.post('/folders', folderForm);
+        toast.success('Carpeta creada');
+      }
+      setShowFolderModal(false);
+      setEditingFolder(null);
+      setFolderForm({ nombre: '', descripcion: '' });
+      fetchData();
+    } catch (error) {
+      toast.error('Error al guardar carpeta');
+    }
+  };
+
+  const openEditFolder = (f) => {
+    setEditingFolder(f);
+    setFolderForm({ nombre: f.nombre, descripcion: f.descripcion || '' });
+    setShowFolderModal(true);
+  };
+
+  const handleDeleteFolder = async (id) => {
+    if (window.confirm('Eliminar esta carpeta? Los manuales dentro se mantendran pero quedaran sin carpeta.')) {
+      try {
+        await API.delete("/folders/" + id);
+        toast.success('Carpeta eliminada');
+        fetchData();
+      } catch (error) {
+        toast.error('Error al eliminar');
+      }
+    }
+  };
+
+  const openAssignFolder = (f) => {
+    setSelectedFolder(f);
+    var assignedIds = (f.usuarios || []).map(function(u) { return u.id; });
+    setSelectedFolderUsers(assignedIds);
+    setShowFolderAssignModal(true);
+  };
+
+  const toggleFolderUser = (userId) => {
+    setSelectedFolderUsers(function(prev) {
+      return prev.includes(userId) ? prev.filter(function(id) { return id !== userId; }) : prev.concat([userId]);
+    });
+  };
+
+  const handleSaveFolderAssign = async () => {
+    try {
+      await API.post("/folders/" + selectedFolder.id + "/usuarios", { usuarios: selectedFolderUsers });
+      toast.success('Carpeta asignada correctamente');
+      setShowFolderAssignModal(false);
+      setSelectedFolder(null);
+      setSelectedFolderUsers([]);
+      fetchData();
+    } catch (error) {
+      toast.error('Error al asignar carpeta');
+    }
+  };
+
   const exportUsersToExcel = () => {
     const data = users.filter(function(u) { return u.rol !== 'admin'; }).map(function(u) {
       const assigned = manuals.filter(function(m) {
@@ -247,7 +321,8 @@ const Admin = () => {
       titulo: manual.titulo,
       descripcion: manual.descripcion,
       categoria: manual.categoria,
-      archivo: null
+      archivo: null,
+      folder_id: manual.folder_id || ''
     });
     setShowUploadModal(true);
   };
@@ -387,6 +462,7 @@ const Admin = () => {
             <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
               <Tab eventKey="manuales" title={<span><FiFileText className="me-1" /> Manuales</span>} />
               <Tab eventKey="usuarios" title={<span><FiUsers className="me-1" /> Usuarios</span>} />
+              <Tab eventKey="carpetas" title={<span><FiFolder className="me-1" /> Carpetas</span>} />
               <Tab eventKey="actividad" title={<span><FiActivity className="me-1" /> Actividad</span>} />
             </Tabs>
 
@@ -405,7 +481,7 @@ const Admin = () => {
                     </Button>
                     <Button onClick={() => {
                       setEditingManual(null);
-                      setManualForm({ titulo: '', descripcion: '', categoria: 'Manuales', archivo: null });
+                      setManualForm({ titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: '' });
                       setShowUploadModal(true);
                     }} style={{
                       background: 'linear-gradient(135deg, #0066cc, #00aaff)',
@@ -421,6 +497,7 @@ const Admin = () => {
                     <tr>
                       <th><FiFileText className="me-1" /> Manual</th>
                       <th><FiGrid className="me-1" /> Categoria</th>
+                      <th><FiFolder className="me-1" /> Carpeta</th>
                       <th><FiUsers className="me-1" /> Asignados</th>
                       <th>Fecha</th>
                       <th className="text-end">Acciones</th>
@@ -448,6 +525,18 @@ const Admin = () => {
                           <Badge bg={getCategoriaColor(manual.categoria)} style={{ borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px', width: 'fit-content' }}>
                             {catIcons[manual.categoria]} {manual.categoria}
                           </Badge>
+                        </td>
+                        <td>
+                          {manual.folder_id ? (
+                            (function() {
+                              var f = folders.find(function(folder) { return folder.id === manual.folder_id; });
+                              return f
+                                ? <Badge bg="warning" text="dark" style={{ borderRadius: '6px' }}><FiFolder className="me-1" />{f.nombre}</Badge>
+                                : <small style={{ color: '#aaa' }}>-</small>;
+                            })()
+                          ) : (
+                            <small style={{ color: '#aaa' }}>Sin carpeta</small>
+                          )}
                         </td>
                         <td><Badge bg="info" style={{ borderRadius: '6px' }}>{manual.asignados?.length || 0} usuario(s)</Badge></td>
                         <td><small>{new Date(manual.created_at).toLocaleDateString('es-VE')}</small></td>
@@ -558,6 +647,87 @@ const Admin = () => {
                     })}
                   </tbody>
                 </Table>
+              </>
+            )}
+
+            {activeTab === 'carpetas' && (
+              <>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h6 style={{ fontWeight: '700', color: '#0a1628', margin: 0 }}>
+                    <FiFolder className="me-1" /> Carpetas de manuales
+                  </h6>
+                  <Button onClick={() => {
+                    setEditingFolder(null);
+                    setFolderForm({ nombre: '', descripcion: '' });
+                    setShowFolderModal(true);
+                  }} style={{
+                    background: 'linear-gradient(135deg, #ff6600, #ff9900)',
+                    border: 'none', borderRadius: '10px', padding: '8px 20px'
+                  }}>
+                    <FiFolderPlus className="me-1" /> Nueva Carpeta
+                  </Button>
+                </div>
+
+                {folders.length === 0 ? (
+                  <Card style={{ border: 'none', borderRadius: '16px', textAlign: 'center', padding: '50px 20px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                    <FiFolder size={50} color="#ccc" />
+                    <h5 className="mt-3" style={{ color: '#666' }}>No hay carpetas creadas</h5>
+                    <p style={{ color: '#999' }}>
+                      Crea carpetas (ej: "SAE", "Instructivos SAE") y asignalas a los usuarios
+                    </p>
+                  </Card>
+                ) : (
+                  <Row>
+                    {folders.map((f) => (
+                      <Col lg={4} md={6} key={f.id} className="mb-4">
+                        <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.08)', height: '100%' }}>
+                          <Card.Body>
+                            <div className="d-flex align-items-center mb-3">
+                              <div style={{
+                                width: '48px', height: '48px',
+                                background: 'linear-gradient(135deg, #ff6600, #ff9900)',
+                                borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                              }}>
+                                <FiFolder size={24} color="white" />
+                              </div>
+                              <div className="ms-3">
+                                <h6 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>{f.nombre}</h6>
+                                <small style={{ color: '#888' }}>{f.manuales?.length || 0} manual(es)</small>
+                              </div>
+                            </div>
+                            {f.descripcion && <p style={{ color: '#666', fontSize: '0.85rem' }}>{f.descripcion}</p>}
+                            <div className="mb-3">
+                              <Badge bg={f.usuarios?.length > 0 ? 'success' : 'secondary'}
+                                style={{ cursor: 'pointer', borderRadius: '6px' }}
+                                onClick={() => openAssignFolder(f)}>
+                                <FiUsers className="me-1" />{f.usuarios?.length || 0} usuario(s)
+                              </Badge>
+                            </div>
+                            {f.manuales && f.manuales.length > 0 && (
+                              <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '10px' }}>
+                                {f.manuales.map(function(m) {
+                                  return (
+                                    <div key={m.id} style={{ fontSize: '0.8rem', color: '#666', padding: '4px 0', borderBottom: '1px solid #f5f5f5' }}>
+                                      <FiFileText className="me-1" style={{ color: '#0066cc' }} />{m.titulo}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                            <div className="d-flex gap-2">
+                              <Button variant="outline-info" size="sm" onClick={() => openAssignFolder(f)}
+                                style={{ borderRadius: '8px' }}><FiUsers className="me-1" />Asignar</Button>
+                              <Button variant="outline-primary" size="sm" onClick={() => openEditFolder(f)}
+                                style={{ borderRadius: '8px' }}><FiEdit2 className="me-1" />Editar</Button>
+                              <Button variant="outline-danger" size="sm" onClick={() => handleDeleteFolder(f.id)}
+                                style={{ borderRadius: '8px' }}><FiTrash2 className="me-1" /></Button>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+                )}
               </>
             )}
 
@@ -727,8 +897,19 @@ const Admin = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ fontWeight: '600' }}><FiFolder className="me-1" /> Carpeta (opcional)</Form.Label>
+                  <Form.Select value={manualForm.folder_id}
+                    onChange={(e) => setManualForm({ ...manualForm, folder_id: e.target.value })}
+                    style={{ borderRadius: '10px', padding: '10px 15px' }}>
+                    <option value="">Sin carpeta</option>
+                    {folders.map(f => <option key={f.id} value={f.id}>{f.nombre}</option>)}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
               {!editingManual && (
-                <Col md={6}>
+                <Col md={12}>
                   <Form.Group className="mb-3">
                     <Form.Label style={{ fontWeight: '600' }}><FiHardDrive className="me-1" /> Archivo PDF</Form.Label>
                     <Form.Control type="file" accept=".pdf"
@@ -897,6 +1078,91 @@ const Admin = () => {
             style={{ borderRadius: '8px' }}>Cancelar</Button>
           <Button onClick={handleAssign} style={{
             background: 'linear-gradient(135deg, #0066cc, #00aaff)',
+            border: 'none', borderRadius: '8px'
+          }}>
+            <FiCheck className="me-1" /> Guardar Asignacion
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showFolderModal} onHide={() => { setShowFolderModal(false); setEditingFolder(null); }} centered>
+        <Modal.Header closeButton style={{ borderBottom: 'none', padding: '20px 25px' }}>
+          <Modal.Title style={{ fontWeight: '700' }}>
+            <FiFolder className="me-2" />
+            {editingFolder ? 'Editar Carpeta' : 'Nueva Carpeta'}
+          </Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleSaveFolder}>
+          <Modal.Body style={{ padding: '0 25px' }}>
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontWeight: '600' }}><FiFolder className="me-1" /> Nombre de la carpeta</Form.Label>
+              <Form.Control value={folderForm.nombre}
+                onChange={(e) => setFolderForm({ ...folderForm, nombre: e.target.value })}
+                placeholder="Ej: SAE, Instructivos SAE, Manuales Tecnicos"
+                required style={{ borderRadius: '10px', padding: '10px 15px' }} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label style={{ fontWeight: '600' }}><FiBook className="me-1" /> Descripcion (opcional)</Form.Label>
+              <Form.Control as="textarea" rows={2} value={folderForm.descripcion}
+                onChange={(e) => setFolderForm({ ...folderForm, descripcion: e.target.value })}
+                placeholder="Para que sirve esta carpeta?"
+                style={{ borderRadius: '10px', padding: '10px 15px' }} />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer style={{ borderTop: 'none', padding: '15px 25px' }}>
+            <Button variant="secondary" onClick={() => { setShowFolderModal(false); setEditingFolder(null); }}
+              style={{ borderRadius: '8px' }}>Cancelar</Button>
+            <Button type="submit" style={{
+              background: 'linear-gradient(135deg, #ff6600, #ff9900)',
+              border: 'none', borderRadius: '8px'
+            }}><FiCheck className="me-1" /> {editingFolder ? 'Guardar Cambios' : 'Crear Carpeta'}</Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+
+      <Modal show={showFolderAssignModal} onHide={() => { setShowFolderAssignModal(false); setSelectedFolder(null); setSelectedFolderUsers([]); }}
+        size="lg" centered>
+        <Modal.Header closeButton style={{ borderBottom: 'none', padding: '20px 25px' }}>
+          <Modal.Title style={{ fontWeight: '700' }}>
+            <FiUsers className="me-2" />
+            Asignar carpeta: {selectedFolder?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ padding: '0 25px' }}>
+          <p style={{ color: '#666' }}>Selecciona los usuarios que podran ver los manuales de esta carpeta:</p>
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            {users.filter(function(u) { return u.rol !== 'admin'; }).map((u) => (
+              <div key={u.id} onClick={() => toggleFolderUser(u.id)} style={{
+                display: 'flex', alignItems: 'center', padding: '12px 15px',
+                marginBottom: '8px', borderRadius: '10px',
+                border: selectedFolderUsers.includes(u.id) ? '2px solid #ff6600' : '2px solid #e0e0e0',
+                background: selectedFolderUsers.includes(u.id) ? '#fff7f0' : 'white',
+                cursor: 'pointer', transition: 'all 0.2s'
+              }}>
+                <div style={{
+                  width: '40px', height: '40px', background: '#00aa66',
+                  borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <FiUser size={20} color="white" />
+                </div>
+                <div className="ms-3" style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '600' }}>{u.nombre}</div>
+                  <small style={{ color: '#888' }}>{u.email}</small>
+                </div>
+                {selectedFolderUsers.includes(u.id) && <FiCheck size={22} color="#ff6600" />}
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-muted">
+            <small><FiUsers className="me-1" />{selectedFolderUsers.length} usuario(s) seleccionado(s)</small>
+          </div>
+        </Modal.Body>
+        <Modal.Footer style={{ borderTop: 'none', padding: '15px 25px' }}>
+          <Button variant="secondary" onClick={() => { setShowFolderAssignModal(false); setSelectedFolderUsers([]); }}
+            style={{ borderRadius: '8px' }}>Cancelar</Button>
+          <Button onClick={handleSaveFolderAssign} style={{
+            background: 'linear-gradient(135deg, #ff6600, #ff9900)',
             border: 'none', borderRadius: '8px'
           }}>
             <FiCheck className="me-1" /> Guardar Asignacion
