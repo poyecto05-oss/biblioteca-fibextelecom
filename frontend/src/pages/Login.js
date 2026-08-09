@@ -112,8 +112,27 @@ const Login = () => {
           width: '100%', maxWidth: '420px',
           background: 'rgba(255,255,255,0.98)', borderRadius: '20px',
           boxShadow: '0 40px 90px rgba(0,0,0,0.45)',
-          padding: '40px 40px 28px'
+          padding: '40px 40px 28px',
+          position: 'relative', overflow: 'hidden'
         }}>
+          <FaServer style={{
+            position: 'absolute', top: '12px', right: '14px', pointerEvents: 'none',
+            color: 'rgba(0,102,204,0.07)', fontSize: '2.6rem'
+          }} />
+          <FaCode style={{
+            position: 'absolute', top: '40px', right: '28px', pointerEvents: 'none',
+            color: 'rgba(0,102,204,0.06)', fontSize: '1.6rem'
+          }} />
+          <FaDatabase style={{
+            position: 'absolute', bottom: '12px', left: '14px', pointerEvents: 'none',
+            color: 'rgba(0,102,204,0.07)', fontSize: '2.4rem'
+          }} />
+          <FaMicrochip style={{
+            position: 'absolute', bottom: '46px', left: '28px', pointerEvents: 'none',
+            color: 'rgba(0,102,204,0.06)', fontSize: '1.5rem'
+          }} />
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
           <div className="text-center mb-4">
             <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
               style={{ width: '220px', display: 'block', margin: '0 auto 14px' }} />
@@ -181,6 +200,7 @@ const Login = () => {
             <small style={{ color: '#a6adbb', fontSize: '0.75rem' }}>
               Hecho por Paulimar Alvarado
             </small>
+          </div>
           </div>
         </div>
       </div>
