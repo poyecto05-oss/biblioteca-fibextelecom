@@ -31,36 +31,33 @@ const Login = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(160deg, #0a1830 0%, #16324f 55%, #0d2138 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative', overflow: 'hidden'
-    }}>
+    <div style={{ minHeight: '100vh', display: 'flex', background: '#ffffff' }}>
       <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        flex: 1.2,
         backgroundImage: 'url(/login-bg.png)',
-        backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-        opacity: 0.35, pointerEvents: 'none'
-      }} />
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'linear-gradient(180deg, rgba(10,24,48,0.55) 0%, rgba(10,24,48,0.35) 50%, rgba(10,24,48,0.6) 100%)',
-        pointerEvents: 'none'
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }} />
 
-      <Container style={{ maxWidth: '440px', position: 'relative', zIndex: 1 }}>
+      <div style={{
+        flex: 1,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0f2440 0%, #1c3d5a 100%)',
+        padding: '40px 20px'
+      }}>
         <Card style={{
+          width: '100%', maxWidth: '420px',
           background: 'rgba(255,255,255,0.98)', border: 'none',
-          borderRadius: '20px', boxShadow: '0 30px 70px rgba(0,0,0,0.45)'
+          borderRadius: '20px', boxShadow: '0 30px 70px rgba(0,0,0,0.35)'
         }}>
           <Card.Body className="p-5">
             <div className="text-center mb-4">
               <img src="/fibex-logo.jpeg" alt="Fibex Telecom"
-                style={{ width: '220px', marginBottom: '8px' }} />
+                style={{ width: '200px', marginBottom: '10px' }} />
               <h2 style={{
-                fontWeight: '800', color: '#0a1628', fontSize: '1.5rem',
-                letterSpacing: '1px', marginTop: '4px'
+                fontWeight: '800', color: '#0a1628', fontSize: '1.35rem',
+                letterSpacing: '1px'
               }}>
                 Biblioteca Digital
               </h2>
@@ -112,7 +109,7 @@ const Login = () => {
             </div>
           </Card.Body>
         </Card>
-      </Container>
+      </div>
     </div>
   );
 };
