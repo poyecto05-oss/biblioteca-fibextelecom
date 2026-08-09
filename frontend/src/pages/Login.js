@@ -41,12 +41,20 @@ const Login = () => {
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
         backgroundImage: 'url(/login-bg.png)',
         backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-        opacity: 0.18, pointerEvents: 'none'
+        opacity: 0.08, pointerEvents: 'none'
       }} />
 
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '900px' }}>
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <img src="/fibex-logo.jpeg" alt="Fibex Telecom" style={{ width: '240px' }} />
+          <h2 style={{
+            fontWeight: '800', color: '#ffffff', fontSize: '1.6rem',
+            letterSpacing: '2px', textShadow: '0 4px 20px rgba(0,0,0,0.4)', margin: 0
+          }}>
+            Biblioteca Digital Fibextelecom
+          </h2>
+          <small style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '1px' }}>
+            Sistema de Manuales e Instructivos
+          </small>
         </div>
 
         <div style={{
@@ -85,11 +93,12 @@ const Login = () => {
               padding: '35px 35px 25px'
             }}>
               <div className="text-center mb-4">
-                <h3 style={{ fontWeight: '800', color: '#0a1628', fontSize: '1.2rem' }}>
-                  <FiShield className="me-2" style={{ color: '#0066cc' }} />
+                <img src="/fibex-logo.jpeg" alt="Fibex Telecom"
+                  style={{ width: '180px', marginBottom: '8px' }} />
+                <h3 style={{ fontWeight: '700', color: '#0a1628', fontSize: '1.05rem', margin: 0 }}>
                   Biblioteca Digital
                 </h3>
-                <p style={{ color: '#8a94a6', fontSize: '0.8rem', margin: '4px 0 0' }}>
+                <p style={{ color: '#8a94a6', fontSize: '0.78rem', margin: '4px 0 0' }}>
                   Departamento de Sistemas - Fibextelecom
                 </p>
               </div>
