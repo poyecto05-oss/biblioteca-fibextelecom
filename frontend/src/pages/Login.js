@@ -51,43 +51,43 @@ const Login = () => {
 
       <div style={{
         position: 'absolute', top: '18%', left: '12%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.12)', fontSize: '3.2rem'
+        color: 'rgba(160,215,255,0.35)', fontSize: '3.2rem'
       }}><FaServer /></div>
       <div style={{
         position: 'absolute', top: '12%', right: '14%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.12)', fontSize: '3rem'
+        color: 'rgba(160,215,255,0.35)', fontSize: '3rem'
       }}><FaCode /></div>
       <div style={{
         position: 'absolute', bottom: '20%', left: '10%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.12)', fontSize: '2.8rem'
+        color: 'rgba(160,215,255,0.35)', fontSize: '2.8rem'
       }}><FaDatabase /></div>
       <div style={{
         position: 'absolute', bottom: '14%', right: '12%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.12)', fontSize: '3rem'
+        color: 'rgba(160,215,255,0.35)', fontSize: '3rem'
       }}><FaMicrochip /></div>
       <div style={{
         position: 'absolute', top: '38%', left: '6%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.10)', fontSize: '2.2rem'
+        color: 'rgba(160,215,255,0.30)', fontSize: '2.2rem'
       }}><FaTerminal /></div>
       <div style={{
         position: 'absolute', top: '42%', right: '7%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.10)', fontSize: '2.4rem'
+        color: 'rgba(160,215,255,0.30)', fontSize: '2.4rem'
       }}><FaNetworkWired /></div>
       <div style={{
         position: 'absolute', top: '24%', left: '30%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.10)', fontSize: '2rem'
+        color: 'rgba(160,215,255,0.28)', fontSize: '2rem'
       }}><FaCog /></div>
       <div style={{
         position: 'absolute', bottom: '30%', right: '30%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.10)', fontSize: '2.2rem'
+        color: 'rgba(160,215,255,0.28)', fontSize: '2.2rem'
       }}><FaFolder /></div>
       <div style={{
         position: 'absolute', top: '10%', left: '45%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.08)', fontSize: '1.8rem'
+        color: 'rgba(160,215,255,0.25)', fontSize: '1.8rem'
       }}><FaCloud /></div>
       <div style={{
         position: 'absolute', bottom: '10%', left: '42%', pointerEvents: 'none',
-        color: 'rgba(255,255,255,0.08)', fontSize: '2rem'
+        color: 'rgba(160,215,255,0.25)', fontSize: '2rem'
       }}><FaLaptopCode /></div>
 
       <header style={{
@@ -115,22 +115,38 @@ const Login = () => {
           padding: '40px 40px 28px',
           position: 'relative', overflow: 'hidden'
         }}>
-          <FaServer style={{
-            position: 'absolute', top: '12px', right: '14px', pointerEvents: 'none',
-            color: 'rgba(0,102,204,0.07)', fontSize: '2.6rem'
-          }} />
-          <FaCode style={{
-            position: 'absolute', top: '40px', right: '28px', pointerEvents: 'none',
-            color: 'rgba(0,102,204,0.06)', fontSize: '1.6rem'
-          }} />
-          <FaDatabase style={{
-            position: 'absolute', bottom: '12px', left: '14px', pointerEvents: 'none',
-            color: 'rgba(0,102,204,0.07)', fontSize: '2.4rem'
-          }} />
-          <FaMicrochip style={{
-            position: 'absolute', bottom: '46px', left: '28px', pointerEvents: 'none',
-            color: 'rgba(0,102,204,0.06)', fontSize: '1.5rem'
-          }} />
+          <div style={{
+            position: 'absolute', top: '16px', right: '16px', pointerEvents: 'none',
+            width: '48px', height: '48px', borderRadius: '12px',
+            background: 'rgba(0,102,204,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <FaServer style={{ color: '#0066cc', fontSize: '1.6rem' }} />
+          </div>
+          <div style={{
+            position: 'absolute', top: '74px', right: '22px', pointerEvents: 'none',
+            width: '38px', height: '38px', borderRadius: '10px',
+            background: 'rgba(0,153,255,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <FaCode style={{ color: '#0088dd', fontSize: '1.2rem' }} />
+          </div>
+          <div style={{
+            position: 'absolute', bottom: '14px', left: '16px', pointerEvents: 'none',
+            width: '48px', height: '48px', borderRadius: '12px',
+            background: 'rgba(0,102,204,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <FaDatabase style={{ color: '#0066cc', fontSize: '1.6rem' }} />
+          </div>
+          <div style={{
+            position: 'absolute', bottom: '72px', left: '22px', pointerEvents: 'none',
+            width: '38px', height: '38px', borderRadius: '10px',
+            background: 'rgba(0,153,255,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <FaMicrochip style={{ color: '#0088dd', fontSize: '1.2rem' }} />
+          </div>
 
           <div style={{ position: 'relative', zIndex: 1 }}>
           <div className="text-center mb-4">
