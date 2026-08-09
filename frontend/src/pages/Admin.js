@@ -55,9 +55,7 @@ const Admin = () => {
     'Manuales', 'Instructivo'
   ];
 
-  const categoriasExistentes = manuals.length > 0
-    ? [...new Set(manuals.map(function(m) { return m.categoria; }))]
-    : categorias;
+  const categoriasExistentes = [...new Set(categorias.concat(manuals.map(function(m) { return m.categoria; })))];
 
   const catIcons = {
     'Manuales': <FiFileText size={18} />,
@@ -450,9 +448,13 @@ const Admin = () => {
         {(() => {
           var conteoCat = {};
           manuals.forEach(function(m) { conteoCat[m.categoria] = (conteoCat[m.categoria] || 0) + 1; });
-          var categoriasUsadas = Object.keys(conteoCat);
-          var tarjetas = categoriasUsadas.map(function(c) {
-            return { icon: c === 'Instructivo' ? <FiCpu size={28} /> : <FiFileText size={28} />, label: c, value: conteoCat[c], color: c === 'Instructivo' ? '#00aa66' : '#0066cc' };
+          var tarjetas = categoriasExistentes.map(function(c) {
+            return {
+              icon: c === 'Instructivo' ? <FiCpu size={28} /> : <FiFileText size={28} />,
+              label: c,
+              value: conteoCat[c] || 0,
+              color: c === 'Instructivo' ? '#00aa66' : '#0066cc'
+            };
           });
           tarjetas.push({ icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#ff6600' });
           return (
