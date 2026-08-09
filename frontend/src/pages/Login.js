@@ -33,22 +33,38 @@ const Login = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f2440 0%, #1c3d5a 50%, #132e45 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center'
+      background: 'linear-gradient(160deg, #0a1830 0%, #16324f 55%, #0d2138 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'relative', overflow: 'hidden'
     }}>
-      <Container style={{ maxWidth: '420px' }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundImage: 'url(/fibex-logo.jpeg)',
+        backgroundSize: '80%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
+        opacity: 0.06, pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        background: 'radial-gradient(circle at 50% 0%, rgba(0,170,255,0.08) 0%, transparent 60%)',
+        pointerEvents: 'none'
+      }} />
+
+      <Container style={{ maxWidth: '440px', position: 'relative', zIndex: 1 }}>
         <Card style={{
-          background: 'rgba(255,255,255,0.97)', border: 'none',
-          borderRadius: '20px', boxShadow: '0 25px 60px rgba(0,0,0,0.3)'
+          background: 'rgba(255,255,255,0.98)', border: 'none',
+          borderRadius: '20px', boxShadow: '0 30px 70px rgba(0,0,0,0.45)'
         }}>
           <Card.Body className="p-5">
             <div className="text-center mb-4">
-              <img src="/logo-fibex.jpg" alt="Fibex Telecom"
-                style={{ width: '130px', marginBottom: '12px', borderRadius: '8px' }} />
-              <h3 style={{ fontWeight: '700', color: '#0a1628', fontSize: '1.15rem' }}>
-                Biblioteca de Manuales
-              </h3>
-              <p style={{ color: '#888', fontSize: '0.85rem', margin: 0 }}>
+              <img src="/fibex-logo.jpeg" alt="Fibex Telecom"
+                style={{ width: '220px', marginBottom: '8px' }} />
+              <h2 style={{
+                fontWeight: '800', color: '#0a1628', fontSize: '1.5rem',
+                letterSpacing: '1px', marginTop: '4px'
+              }}>
+                Biblioteca Digital
+              </h2>
+              <p style={{ color: '#8a94a6', fontSize: '0.85rem', margin: 0 }}>
                 Departamento de Sistemas
               </p>
             </div>
