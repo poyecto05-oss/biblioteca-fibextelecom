@@ -435,7 +435,7 @@ const Admin = () => {
           {[
             { icon: <FiFileText size={28} />, label: 'Manuales', value: manuals.length, color: '#0066cc' },
             { icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#00aa66' },
-            { icon: <FiGrid size={28} />, label: 'Categorias', value: [...new Set(manuals.map(function(m) { return m.categoria; }))].length, color: '#ff6600' }
+            { icon: <FiGrid size={28} />, label: 'Categorias', value: [...new Set(manuals.map(function(m) { return m.categoria; }))].join(' / ') || 'Ninguna', color: '#ff6600' }
           ].map((stat, i) => (
             <Col md={4} key={i} className="mb-3">
               <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
