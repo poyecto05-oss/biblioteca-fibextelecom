@@ -433,42 +433,40 @@ const Admin = () => {
       </div>
 
       <Container className="py-4">
-        <Row className="mb-4">
-          {[
-            {
-              icon: <FiFileText size={28} />,
-              label: 'Documentos',
-              value: manuals.length,
-              color: '#0066cc',
-              detalle: (function() {
-                var counts = {};
-                manuals.forEach(function(m) { counts[m.categoria] = (counts[m.categoria] || 0) + 1; });
-                return Object.keys(counts).map(function(c) { return c + ': ' + counts[c]; }).join('  |  ');
-              })()
-            },
-            { icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#00aa66' },
-            { icon: <FiGrid size={28} />, label: 'Categorias', value: [...new Set(manuals.map(function(m) { return m.categoria; }))].join(' / ') || 'Ninguna', color: '#ff6600' }
-          ].map((stat, i) => (
-            <Col md={4} key={i} className="mb-3">
-              <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                <Card.Body className="d-flex align-items-center">
-                  <div style={{
-                    width: '60px', height: '60px', background: stat.color + '15',
-                    borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: stat.color
-                  }}>
-                    {stat.icon}
-                  </div>
-                  <div className="ms-3">
-                    <h3 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>{stat.value}</h3>
-                    <small style={{ color: '#888' }}>{stat.label}</small>
-                    {stat.detalle && <div><small style={{ color: '#666', fontSize: '0.75rem' }}>{stat.detalle}</small></div>}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        {(() => {
+          var conteoCat = {};
+          manuals.forEach(function(m) { conteoCat[m.categoria] = (conteoCat[m.categoria] || 0) + 1; });
+          var categoriasUsadas = Object.keys(conteoCat);
+          var detalleDoc = categoriasUsadas.map(function(c) { return c + ': ' + conteoCat[c]; }).join('  |  ');
+          return (
+            <Row className="mb-4">
+              {[
+                { icon: <FiFileText size={28} />, label: 'Documentos', value: manuals.length, color: '#0066cc', detalle: detalleDoc },
+                { icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#00aa66' },
+                { icon: <FiGrid size={28} />, label: 'Categorias', value: categoriasUsadas.join(' / ') || 'Ninguna', color: '#ff6600' }
+              ].map((stat, i) => (
+                <Col md={4} key={i} className="mb-3">
+                  <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+                    <Card.Body className="d-flex align-items-center">
+                      <div style={{
+                        width: '60px', height: '60px', background: stat.color + '15',
+                        borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: stat.color
+                      }}>
+                        {stat.icon}
+                      </div>
+                      <div className="ms-3">
+                        <h3 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>{stat.value}</h3>
+                        <small style={{ color: '#888' }}>{stat.label}</small>
+                        {stat.detalle && <div><small style={{ color: '#666', fontSize: '0.75rem' }}>{stat.detalle}</small></div>}
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          );
+        })()}
 
         <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
           <Card.Body className="p-4">
