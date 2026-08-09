@@ -502,7 +502,7 @@ const Admin = () => {
                       background: 'linear-gradient(135deg, #0066cc, #00aaff)',
                       border: 'none', borderRadius: '10px', padding: '8px 20px'
                     }}>
-                      <FiUpload className="me-1" /> Subir Manual
+                      <FiUpload className="me-1" /> Subir Documento
                     </Button>
                   </div>
                 </div>
@@ -510,7 +510,7 @@ const Admin = () => {
                 <Table responsive hover style={{ borderRadius: '12px', overflow: 'hidden' }}>
                   <thead style={{ background: '#f8f9fa' }}>
                     <tr>
-                      <th><FiFileText className="me-1" /> Manual</th>
+                      <th><FiFileText className="me-1" /> Documento</th>
                       <th><FiGrid className="me-1" /> Categoria</th>
                       <th><FiFolder className="me-1" /> Carpeta</th>
                       <th><FiUsers className="me-1" /> Asignados</th>
@@ -882,13 +882,13 @@ const Admin = () => {
         <Modal.Header closeButton style={{ borderBottom: 'none', padding: '20px 25px' }}>
           <Modal.Title style={{ fontWeight: '700' }}>
             <FiUpload className="me-2" />
-            {editingManual ? 'Editar Manual' : 'Subir Nuevo Manual'}
+            {editingManual ? 'Editar Documento' : 'Subir Nuevo Documento'}
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleUploadManual}>
           <Modal.Body style={{ padding: '0 25px' }}>
             <Form.Group className="mb-3">
-              <Form.Label style={{ fontWeight: '600' }}><FiFileText className="me-1" /> Titulo del manual</Form.Label>
+              <Form.Label style={{ fontWeight: '600' }}><FiFileText className="me-1" /> Titulo del documento</Form.Label>
               <Form.Control value={manualForm.titulo}
                 onChange={(e) => setManualForm({ ...manualForm, titulo: e.target.value })}
                 placeholder="Ej: Configuracion de Router MikroTik"
@@ -941,7 +941,7 @@ const Admin = () => {
             <Button type="submit" style={{
               background: 'linear-gradient(135deg, #0066cc, #00aaff)',
               border: 'none', borderRadius: '8px'
-            }}><FiUpload className="me-1" /> {editingManual ? 'Guardar Cambios' : 'Subir Manual'}</Button>
+            }}><FiUpload className="me-1" /> {editingManual ? 'Guardar Cambios' : 'Subir Documento'}</Button>
           </Modal.Footer>
         </Form>
       </Modal>
