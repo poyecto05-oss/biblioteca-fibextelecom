@@ -33,7 +33,7 @@ const Admin = () => {
   const [selectedManuals, setSelectedManuals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [manualForm, setManualForm] = useState({
-    titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: ''
+    titulo: '', descripcion: '', categoria: 'Instructivo', archivo: null, folder_id: ''
   });
   const [userForm, setUserForm] = useState({
     nombre: '', email: '', password: '', rol: 'usuario', departamento: 'Sistemas'
@@ -104,7 +104,7 @@ const Admin = () => {
       }
       setShowUploadModal(false);
       setEditingManual(null);
-      setManualForm({ titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: '' });
+      setManualForm({ titulo: '', descripcion: '', categoria: 'Instructivo', archivo: null, folder_id: '' });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.msg || 'Error al guardar manual');
@@ -435,7 +435,7 @@ const Admin = () => {
           {[
             { icon: <FiFileText size={28} />, label: 'Manuales', value: manuals.length, color: '#0066cc' },
             { icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#00aa66' },
-            { icon: <FiGrid size={28} />, label: 'Categorias', value: categorias.length, color: '#ff6600' }
+            { icon: <FiGrid size={28} />, label: 'Categorias', value: [...new Set(manuals.map(function(m) { return m.categoria; }))].length, color: '#ff6600' }
           ].map((stat, i) => (
             <Col md={4} key={i} className="mb-3">
               <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
@@ -481,7 +481,7 @@ const Admin = () => {
                     </Button>
                     <Button onClick={() => {
                       setEditingManual(null);
-                      setManualForm({ titulo: '', descripcion: '', categoria: 'Manuales', archivo: null, folder_id: '' });
+                      setManualForm({ titulo: '', descripcion: '', categoria: 'Instructivo', archivo: null, folder_id: '' });
                       setShowUploadModal(true);
                     }} style={{
                       background: 'linear-gradient(135deg, #0066cc, #00aaff)',
