@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield } from 'react-icons/fi';
-import {
-  FaBookOpen, FaServer, FaMicrochip, FaDatabase, FaFolderOpen,
-  FaFilePdf, FaSearch, FaNetworkWired, FaLayerGroup
-} from 'react-icons/fa';
+import { FiUser, FiLock, FiShield, FiBookOpen, FiServer, FiDatabase, FiFileText } from 'react-icons/fi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -15,21 +11,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  const Bubble = ({ style, children }) => (
-    <div style={{
-      position: 'absolute', pointerEvents: 'none', zIndex: 1,
-      background: 'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.12), rgba(255,255,255,0.03))',
-      border: '1px solid rgba(255,255,255,0.12)',
-      borderRadius: '50%',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
-      backdropFilter: 'blur(2px)',
-      ...style
-    }}>
-      {children}
-    </div>
-  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,8 +91,8 @@ const Login = () => {
 
             <div style={{
               background: 'linear-gradient(160deg, #0f2440 0%, #1c3d5a 60%, #16324f 100%)',
-              padding: '48px 30px', minHeight: '62vh',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '34px 30px', minHeight: '62vh',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               position: 'relative', overflow: 'hidden'
             }}>
               <div style={{
@@ -121,55 +102,39 @@ const Login = () => {
                 pointerEvents: 'none'
               }} />
 
-              <Bubble style={{ top: '28px', left: '6%', width: '110px', height: '110px' }}>
-                <FaBookOpen style={{ color: 'rgba(160,220,255,0.9)', fontSize: '2.9rem' }} />
-              </Bubble>
-              <Bubble style={{ bottom: '30px', right: '5%', width: '130px', height: '130px' }}>
-                <FaServer style={{ color: 'rgba(160,220,255,0.9)', fontSize: '3.4rem' }} />
-              </Bubble>
-              <Bubble style={{ top: '24px', right: '10%', width: '80px', height: '80px' }}>
-                <FaMicrochip style={{ color: 'rgba(190,235,255,0.85)', fontSize: '2rem' }} />
-              </Bubble>
-              <Bubble style={{ bottom: '44px', left: '12%', width: '92px', height: '92px' }}>
-                <FaDatabase style={{ color: 'rgba(170,225,255,0.85)', fontSize: '2.4rem' }} />
-              </Bubble>
-              <Bubble style={{ top: '46%', left: '4%', width: '70px', height: '70px' }}>
-                <FaLayerGroup style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.7rem' }} />
-              </Bubble>
-              <Bubble style={{ top: '48%', right: '7%', width: '76px', height: '76px' }}>
-                <FaSearch style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.8rem' }} />
-              </Bubble>
-              <Bubble style={{ top: '10%', left: '36%', width: '64px', height: '64px' }}>
-                <FaFolderOpen style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.6rem' }} />
-              </Bubble>
-              <Bubble style={{ bottom: '12%', right: '30%', width: '72px', height: '72px' }}>
-                <FaFilePdf style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.8rem' }} />
-              </Bubble>
-              <Bubble style={{ top: '26%', left: '30%', width: '56px', height: '56px' }}>
-                <FaNetworkWired style={{ color: 'rgba(150,210,255,0.75)', fontSize: '1.4rem' }} />
-              </Bubble>
+              <FiBookOpen style={{
+                position: 'absolute', top: '30px', left: '7%', pointerEvents: 'none',
+                color: 'rgba(120,200,255,0.5)', fontSize: '4.2rem'
+              }} />
+              <FiServer style={{
+                position: 'absolute', bottom: '26px', right: '6%', pointerEvents: 'none',
+                color: 'rgba(120,200,255,0.5)', fontSize: '4.6rem'
+              }} />
+              <FiDatabase style={{
+                position: 'absolute', bottom: '50px', left: '10%', pointerEvents: 'none',
+                color: 'rgba(120,200,255,0.4)', fontSize: '3.2rem'
+              }} />
+              <FiFileText style={{
+                position: 'absolute', top: '90px', right: '12%', pointerEvents: 'none',
+                color: 'rgba(120,200,255,0.4)', fontSize: '2.8rem'
+              }} />
+
+              <div style={{ textAlign: 'center', marginBottom: '22px', position: 'relative', zIndex: 1 }}>
+                <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
+                  style={{ width: '250px', display: 'block', margin: '0 auto 6px' }} />
+                <h3 style={{ fontWeight: '800', color: '#ffffff', fontSize: '1.1rem', margin: 0 }}>
+                  Biblioteca Digital
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', margin: '4px 0 0' }}>
+                  Departamento de Sistemas
+                </p>
+              </div>
 
               <div style={{
                 position: 'relative', zIndex: 1, width: '100%', maxWidth: '430px',
                 background: 'rgba(255,255,255,0.98)', borderRadius: '16px',
-                boxShadow: '0 30px 70px rgba(0,0,0,0.45)', padding: '40px 40px 30px'
+                boxShadow: '0 30px 70px rgba(0,0,0,0.45)', padding: '32px 40px 26px'
               }}>
-                <div className="text-center mb-4">
-                  <div style={{
-                    display: 'inline-block', background: '#343434',
-                    borderRadius: '12px', padding: '10px 24px', marginBottom: '12px'
-                  }}>
-                    <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
-                      style={{ width: '230px', display: 'block' }} />
-                  </div>
-                  <h3 style={{ fontWeight: '800', color: '#0a1628', fontSize: '1.15rem', margin: 0 }}>
-                    Biblioteca Digital
-                  </h3>
-                  <p style={{ color: '#8a94a6', fontSize: '0.85rem', margin: '5px 0 0' }}>
-                    Departamento de Sistemas
-                  </p>
-                </div>
-
                 {error && <Alert variant="danger" style={{ borderRadius: '10px', fontSize: '0.88rem' }}>{error}</Alert>}
 
                 <Form onSubmit={handleSubmit}>
