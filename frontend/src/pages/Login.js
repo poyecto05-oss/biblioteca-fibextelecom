@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { FiUser, FiLock, FiShield } from 'react-icons/fi';
+import { FaServer, FaDatabase, FaCode, FaNetworkWired, FaMicrochip, FaTerminal, FaCog, FaFolder, FaCloud, FaLaptopCode } from 'react-icons/fa';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -47,6 +48,47 @@ const Login = () => {
         borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,153,255,0.12) 0%, rgba(0,153,255,0) 70%)',
         pointerEvents: 'none'
       }} />
+
+      <div style={{
+        position: 'absolute', top: '18%', left: '12%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.12)', fontSize: '3.2rem'
+      }}><FaServer /></div>
+      <div style={{
+        position: 'absolute', top: '12%', right: '14%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.12)', fontSize: '3rem'
+      }}><FaCode /></div>
+      <div style={{
+        position: 'absolute', bottom: '20%', left: '10%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.12)', fontSize: '2.8rem'
+      }}><FaDatabase /></div>
+      <div style={{
+        position: 'absolute', bottom: '14%', right: '12%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.12)', fontSize: '3rem'
+      }}><FaMicrochip /></div>
+      <div style={{
+        position: 'absolute', top: '38%', left: '6%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.10)', fontSize: '2.2rem'
+      }}><FaTerminal /></div>
+      <div style={{
+        position: 'absolute', top: '42%', right: '7%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.10)', fontSize: '2.4rem'
+      }}><FaNetworkWired /></div>
+      <div style={{
+        position: 'absolute', top: '24%', left: '30%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.10)', fontSize: '2rem'
+      }}><FaCog /></div>
+      <div style={{
+        position: 'absolute', bottom: '30%', right: '30%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.10)', fontSize: '2.2rem'
+      }}><FaFolder /></div>
+      <div style={{
+        position: 'absolute', top: '10%', left: '45%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.08)', fontSize: '1.8rem'
+      }}><FaCloud /></div>
+      <div style={{
+        position: 'absolute', bottom: '10%', left: '42%', pointerEvents: 'none',
+        color: 'rgba(255,255,255,0.08)', fontSize: '2rem'
+      }}><FaLaptopCode /></div>
 
       <header style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
