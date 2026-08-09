@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield, FiMonitor } from 'react-icons/fi';
+import { FiUser, FiLock, FiShield } from 'react-icons/fi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -39,16 +39,6 @@ const Login = () => {
     }}>
 
       <div style={{ textAlign: 'center', marginBottom: '26px' }}>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '10px',
-          background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-          padding: '8px 22px', borderRadius: '50px', marginBottom: '14px'
-        }}>
-          <FiMonitor style={{ color: '#4db8ff' }} />
-          <span style={{ color: '#9fc6e8', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase', fontWeight: '600' }}>
-            Intranet Fibextelecom
-          </span>
-        </div>
         <h1 style={{
           fontWeight: '800', color: '#ffffff', fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)',
           letterSpacing: '1px', textShadow: '0 6px 30px rgba(0,0,0,0.45)', margin: 0
@@ -118,8 +108,8 @@ const Login = () => {
                 boxShadow: '0 30px 70px rgba(0,0,0,0.45)', padding: '40px 40px 30px'
               }}>
                 <div className="text-center mb-4">
-                  <img src="/fibex-logo.jpeg" alt="Fibex Telecom"
-                    style={{ width: '200px', marginBottom: '12px' }} />
+                  <img src="/fibextelecom.png" alt="Fibex Telecom"
+                    style={{ width: '230px', marginBottom: '12px' }} />
                   <h3 style={{ fontWeight: '800', color: '#0a1628', fontSize: '1.15rem', margin: 0 }}>
                     Biblioteca Digital
                   </h3>
@@ -182,7 +172,7 @@ const Login = () => {
 
                 <div className="text-center mt-4">
                   <small style={{ color: '#a6adbb', fontSize: '0.75rem' }}>
-                    Acceso restringido - personal autorizado
+                    Hecho por Paulimar Alvarado
                   </small>
                 </div>
               </div>
