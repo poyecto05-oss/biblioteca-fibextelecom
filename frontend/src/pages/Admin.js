@@ -48,6 +48,7 @@ const Admin = () => {
   const [showFolderAssignModal, setShowFolderAssignModal] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [selectedFolderUsers, setSelectedFolderUsers] = useState([]);
+  const [categoriaFiltro, setCategoriaFiltro] = useState('Todas');
 
   const categorias = [
     'Manuales', 'Instructivo'
@@ -356,6 +357,7 @@ const Admin = () => {
   };
 
   const filteredManuals = manuals.filter(function(m) {
+    if (categoriaFiltro !== 'Todas' && m.categoria !== categoriaFiltro) return false;
     return m.titulo.toLowerCase().includes(search.toLowerCase());
   });
 
@@ -460,7 +462,7 @@ const Admin = () => {
         <Card style={{ border: 'none', borderRadius: '16px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
           <Card.Body className="p-4">
             <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
-              <Tab eventKey="manuales" title={<span><FiFileText className="me-1" /> Manuales</span>} />
+              <Tab eventKey="manuales" title={<span><FiFileText className="me-1" /> Documentos</span>} />
               <Tab eventKey="usuarios" title={<span><FiUsers className="me-1" /> Usuarios</span>} />
               <Tab eventKey="carpetas" title={<span><FiFolder className="me-1" /> Carpetas</span>} />
               <Tab eventKey="actividad" title={<span><FiActivity className="me-1" /> Actividad</span>} />
@@ -474,6 +476,12 @@ const Admin = () => {
                     <Form.Control placeholder="Buscar manual..." value={search}
                       onChange={(e) => setSearch(e.target.value)} style={{ border: 'none' }} />
                   </InputGroup>
+                  <Form.Select value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)}
+                    style={{ maxWidth: '200px', borderRadius: '10px', padding: '8px 15px' }}>
+                    <option value="Todas">Todas las categorias</option>
+                    <option value="Manuales">Manuales</option>
+                    <option value="Instructivo">Instructivo</option>
+                  </Form.Select>
                   <div className="d-flex gap-2">
                     <Button onClick={exportManualsToExcel} variant="outline-success"
                       style={{ borderRadius: '10px', padding: '8px 15px' }}>
