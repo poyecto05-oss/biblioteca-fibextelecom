@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield, FiBookOpen, FiServer, FiCpu, FiDatabase, FiMonitor, FiFolder, FiUsers, FiFileText, FiSearch, FiLayers } from 'react-icons/fi';
+import { FiUser, FiLock, FiShield } from 'react-icons/fi';
+import {
+  FaBookOpen, FaServer, FaMicrochip, FaDatabase, FaFolderOpen,
+  FaFilePdf, FaSearch, FaNetworkWired, FaLayerGroup
+} from 'react-icons/fa';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +15,21 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const Bubble = ({ style, children }) => (
+    <div style={{
+      position: 'absolute', pointerEvents: 'none', zIndex: 1,
+      background: 'radial-gradient(circle at 30% 25%, rgba(255,255,255,0.12), rgba(255,255,255,0.03))',
+      border: '1px solid rgba(255,255,255,0.12)',
+      borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
+      backdropFilter: 'blur(2px)',
+      ...style
+    }}>
+      {children}
+    </div>
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,38 +121,33 @@ const Login = () => {
                 pointerEvents: 'none'
               }} />
 
-              <div style={{
-                position: 'absolute', top: '30px', left: '7%',
-                color: 'rgba(255,255,255,0.07)', fontSize: '7rem', pointerEvents: 'none'
-              }}><FiBookOpen /></div>
-              <div style={{
-                position: 'absolute', bottom: '26px', right: '6%',
-                color: 'rgba(255,255,255,0.07)', fontSize: '8rem', pointerEvents: 'none'
-              }}><FiServer /></div>
-              <div style={{
-                position: 'absolute', top: '22px', right: '12%',
-                color: 'rgba(255,255,255,0.06)', fontSize: '4.5rem', pointerEvents: 'none'
-              }}><FiCpu /></div>
-              <div style={{
-                position: 'absolute', bottom: '40px', left: '14%',
-                color: 'rgba(255,255,255,0.06)', fontSize: '5rem', pointerEvents: 'none'
-              }}><FiDatabase /></div>
-              <div style={{
-                position: 'absolute', top: '45%', left: '5%',
-                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
-              }}><FiLayers /></div>
-              <div style={{
-                position: 'absolute', top: '50%', right: '8%',
-                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
-              }}><FiSearch /></div>
-              <div style={{
-                position: 'absolute', top: '12%', left: '38%',
-                color: 'rgba(255,255,255,0.05)', fontSize: '3rem', pointerEvents: 'none'
-              }}><FiFolder /></div>
-              <div style={{
-                position: 'absolute', bottom: '14%', right: '34%',
-                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
-              }}><FiFileText /></div>
+              <Bubble style={{ top: '28px', left: '6%', width: '110px', height: '110px' }}>
+                <FaBookOpen style={{ color: 'rgba(160,220,255,0.9)', fontSize: '2.9rem' }} />
+              </Bubble>
+              <Bubble style={{ bottom: '30px', right: '5%', width: '130px', height: '130px' }}>
+                <FaServer style={{ color: 'rgba(160,220,255,0.9)', fontSize: '3.4rem' }} />
+              </Bubble>
+              <Bubble style={{ top: '24px', right: '10%', width: '80px', height: '80px' }}>
+                <FaMicrochip style={{ color: 'rgba(190,235,255,0.85)', fontSize: '2rem' }} />
+              </Bubble>
+              <Bubble style={{ bottom: '44px', left: '12%', width: '92px', height: '92px' }}>
+                <FaDatabase style={{ color: 'rgba(170,225,255,0.85)', fontSize: '2.4rem' }} />
+              </Bubble>
+              <Bubble style={{ top: '46%', left: '4%', width: '70px', height: '70px' }}>
+                <FaLayerGroup style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.7rem' }} />
+              </Bubble>
+              <Bubble style={{ top: '48%', right: '7%', width: '76px', height: '76px' }}>
+                <FaSearch style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.8rem' }} />
+              </Bubble>
+              <Bubble style={{ top: '10%', left: '36%', width: '64px', height: '64px' }}>
+                <FaFolderOpen style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.6rem' }} />
+              </Bubble>
+              <Bubble style={{ bottom: '12%', right: '30%', width: '72px', height: '72px' }}>
+                <FaFilePdf style={{ color: 'rgba(150,210,255,0.8)', fontSize: '1.8rem' }} />
+              </Bubble>
+              <Bubble style={{ top: '26%', left: '30%', width: '56px', height: '56px' }}>
+                <FaNetworkWired style={{ color: 'rgba(150,210,255,0.75)', fontSize: '1.4rem' }} />
+              </Bubble>
 
               <div style={{
                 position: 'relative', zIndex: 1, width: '100%', maxWidth: '430px',
