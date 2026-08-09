@@ -123,7 +123,7 @@ const Login = () => {
                 <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
                   style={{ width: '250px', display: 'block', margin: '0 auto 6px' }} />
                 <h3 style={{ fontWeight: '800', color: '#ffffff', fontSize: '1.1rem', margin: 0 }}>
-                  Biblioteca Digital
+                  Portal de Conocimiento y Recursos Tecnicos
                 </h3>
                 <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', margin: '4px 0 0' }}>
                   Departamento de Sistemas
