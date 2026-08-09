@@ -3,9 +3,6 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { FiUser, FiLock, FiShield, FiSearch } from 'react-icons/fi';
-import {
-  FaBookReader, FaLaptopCode, FaHeadset, FaChalkboardTeacher
-} from 'react-icons/fa';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -110,13 +107,13 @@ const Login = () => {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
               }}>
                 <div style={{
-                  width: '86px', height: '86px', borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden',
+                  border: '3px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
                 }}>
-                  <FaBookReader style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                  <img src="/vec-lectura.jpg" alt="Lectura" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.62rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
                   Lectura
                 </small>
               </div>
@@ -126,13 +123,13 @@ const Login = () => {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
               }}>
                 <div style={{
-                  width: '86px', height: '86px', borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden',
+                  border: '3px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
                 }}>
-                  <FaLaptopCode style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                  <img src="/vec-pc.jpg" alt="En PC" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.62rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
                   En PC
                 </small>
               </div>
@@ -142,13 +139,13 @@ const Login = () => {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
               }}>
                 <div style={{
-                  width: '86px', height: '86px', borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden',
+                  border: '3px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
                 }}>
-                  <FaHeadset style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                  <img src="/vec-soporte.jpg" alt="Soporte" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.62rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
                   Soporte
                 </small>
               </div>
@@ -158,13 +155,13 @@ const Login = () => {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
               }}>
                 <div style={{
-                  width: '86px', height: '86px', borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden',
+                  border: '3px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
                 }}>
-                  <FaChalkboardTeacher style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                  <img src="/vec-instructivo.jpg" alt="Instructivo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                <small style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.62rem', fontWeight: '600', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
                   Instructivo
                 </small>
               </div>
