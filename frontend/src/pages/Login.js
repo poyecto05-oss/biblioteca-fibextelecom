@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield, FiBookOpen, FiServer, FiDatabase, FiFileText } from 'react-icons/fi';
+import { FiUser, FiLock, FiShield, FiSearch, FiBookOpen, FiServer, FiDatabase, FiFileText } from 'react-icons/fi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -80,11 +80,11 @@ const Login = () => {
               <div style={{
                 flex: 1, marginLeft: '10px', height: '26px', borderRadius: '7px',
                 background: '#ffffff', border: '1px solid #dfe4ec',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                display: 'flex', alignItems: 'center', gap: '6px', padding: '0 12px'
               }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', border: '1px solid #b6c2d4', display: 'inline-block' }} />
-                <span style={{ color: '#6b7686', fontSize: '0.72rem', fontWeight: '500' }}>
-                  https://fibextelecom-biblioteca.vercel.app
+                <FiSearch style={{ color: '#8a94a6', fontSize: '0.8rem' }} />
+                <span style={{ color: '#8a94a6', fontSize: '0.72rem', fontWeight: '500' }}>
+                  Buscar manuales e instructivos...
                 </span>
               </div>
             </div>
