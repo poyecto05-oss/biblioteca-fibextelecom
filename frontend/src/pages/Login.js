@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield } from 'react-icons/fi';
+import { FiUser, FiLock, FiShield, FiBookOpen, FiServer, FiCpu, FiDatabase, FiMonitor, FiFolder, FiUsers, FiFileText, FiSearch, FiLayers } from 'react-icons/fi';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -93,7 +93,7 @@ const Login = () => {
               background: 'linear-gradient(160deg, #0f2440 0%, #1c3d5a 60%, #16324f 100%)',
               padding: '48px 30px', minHeight: '62vh',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              position: 'relative'
+              position: 'relative', overflow: 'hidden'
             }}>
               <div style={{
                 position: 'absolute', top: '0', left: '0', right: '0',
@@ -103,13 +103,51 @@ const Login = () => {
               }} />
 
               <div style={{
+                position: 'absolute', top: '30px', left: '7%',
+                color: 'rgba(255,255,255,0.07)', fontSize: '7rem', pointerEvents: 'none'
+              }}><FiBookOpen /></div>
+              <div style={{
+                position: 'absolute', bottom: '26px', right: '6%',
+                color: 'rgba(255,255,255,0.07)', fontSize: '8rem', pointerEvents: 'none'
+              }}><FiServer /></div>
+              <div style={{
+                position: 'absolute', top: '22px', right: '12%',
+                color: 'rgba(255,255,255,0.06)', fontSize: '4.5rem', pointerEvents: 'none'
+              }}><FiCpu /></div>
+              <div style={{
+                position: 'absolute', bottom: '40px', left: '14%',
+                color: 'rgba(255,255,255,0.06)', fontSize: '5rem', pointerEvents: 'none'
+              }}><FiDatabase /></div>
+              <div style={{
+                position: 'absolute', top: '45%', left: '5%',
+                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
+              }}><FiLayers /></div>
+              <div style={{
+                position: 'absolute', top: '50%', right: '8%',
+                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
+              }}><FiSearch /></div>
+              <div style={{
+                position: 'absolute', top: '12%', left: '38%',
+                color: 'rgba(255,255,255,0.05)', fontSize: '3rem', pointerEvents: 'none'
+              }}><FiFolder /></div>
+              <div style={{
+                position: 'absolute', bottom: '14%', right: '34%',
+                color: 'rgba(255,255,255,0.05)', fontSize: '3.5rem', pointerEvents: 'none'
+              }}><FiFileText /></div>
+
+              <div style={{
                 position: 'relative', zIndex: 1, width: '100%', maxWidth: '430px',
                 background: 'rgba(255,255,255,0.98)', borderRadius: '16px',
                 boxShadow: '0 30px 70px rgba(0,0,0,0.45)', padding: '40px 40px 30px'
               }}>
                 <div className="text-center mb-4">
-                  <img src="/fibextelecom.png" alt="Fibex Telecom"
-                    style={{ width: '230px', marginBottom: '12px' }} />
+                  <div style={{
+                    display: 'inline-block', background: '#343434',
+                    borderRadius: '12px', padding: '10px 24px', marginBottom: '12px'
+                  }}>
+                    <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
+                      style={{ width: '230px', display: 'block' }} />
+                  </div>
                   <h3 style={{ fontWeight: '800', color: '#0a1628', fontSize: '1.15rem', margin: 0 }}>
                     Biblioteca Digital
                   </h3>
