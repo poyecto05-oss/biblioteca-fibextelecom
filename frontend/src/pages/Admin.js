@@ -435,7 +435,17 @@ const Admin = () => {
       <Container className="py-4">
         <Row className="mb-4">
           {[
-            { icon: <FiFileText size={28} />, label: 'Manuales', value: manuals.length, color: '#0066cc' },
+            {
+              icon: <FiFileText size={28} />,
+              label: 'Documentos',
+              value: manuals.length,
+              color: '#0066cc',
+              detalle: (function() {
+                var counts = {};
+                manuals.forEach(function(m) { counts[m.categoria] = (counts[m.categoria] || 0) + 1; });
+                return Object.keys(counts).map(function(c) { return c + ': ' + counts[c]; }).join('  |  ');
+              })()
+            },
             { icon: <FiUsers size={28} />, label: 'Usuarios', value: users.filter(function(u) { return u.rol !== 'admin'; }).length, color: '#00aa66' },
             { icon: <FiGrid size={28} />, label: 'Categorias', value: [...new Set(manuals.map(function(m) { return m.categoria; }))].join(' / ') || 'Ninguna', color: '#ff6600' }
           ].map((stat, i) => (
@@ -452,6 +462,7 @@ const Admin = () => {
                   <div className="ms-3">
                     <h3 style={{ fontWeight: '700', margin: 0, color: '#0a1628' }}>{stat.value}</h3>
                     <small style={{ color: '#888' }}>{stat.label}</small>
+                    {stat.detalle && <div><small style={{ color: '#666', fontSize: '0.75rem' }}>{stat.detalle}</small></div>}
                   </div>
                 </Card.Body>
               </Card>
