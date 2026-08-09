@@ -39,13 +39,13 @@ const Login = () => {
     }}>
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: 'url(/fibex-logo.jpeg)',
-        backgroundSize: '80%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
-        opacity: 0.06, pointerEvents: 'none'
+        backgroundImage: 'url(/login-bg.png)',
+        backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat',
+        opacity: 0.35, pointerEvents: 'none'
       }} />
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'radial-gradient(circle at 50% 0%, rgba(0,170,255,0.08) 0%, transparent 60%)',
+        background: 'linear-gradient(180deg, rgba(10,24,48,0.55) 0%, rgba(10,24,48,0.35) 50%, rgba(10,24,48,0.6) 100%)',
         pointerEvents: 'none'
       }} />
 
