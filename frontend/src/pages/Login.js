@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { FiUser, FiLock, FiShield, FiSearch, FiBookOpen, FiServer, FiDatabase, FiFileText } from 'react-icons/fi';
+import { FiUser, FiLock, FiShield, FiSearch } from 'react-icons/fi';
+import {
+  FaBookReader, FaLaptopCode, FaHeadset, FaChalkboardTeacher
+} from 'react-icons/fa';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -102,22 +105,69 @@ const Login = () => {
                 pointerEvents: 'none'
               }} />
 
-              <FiBookOpen style={{
-                position: 'absolute', top: '30px', left: '7%', pointerEvents: 'none',
-                color: 'rgba(120,200,255,0.5)', fontSize: '4.2rem'
-              }} />
-              <FiServer style={{
-                position: 'absolute', bottom: '26px', right: '6%', pointerEvents: 'none',
-                color: 'rgba(120,200,255,0.5)', fontSize: '4.6rem'
-              }} />
-              <FiDatabase style={{
-                position: 'absolute', bottom: '50px', left: '10%', pointerEvents: 'none',
-                color: 'rgba(120,200,255,0.4)', fontSize: '3.2rem'
-              }} />
-              <FiFileText style={{
-                position: 'absolute', top: '90px', right: '12%', pointerEvents: 'none',
-                color: 'rgba(120,200,255,0.4)', fontSize: '2.8rem'
-              }} />
+              <div style={{
+                position: 'absolute', top: '20px', left: '5%', pointerEvents: 'none',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
+              }}>
+                <div style={{
+                  width: '86px', height: '86px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <FaBookReader style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                </div>
+                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                  Lectura
+                </small>
+              </div>
+
+              <div style={{
+                position: 'absolute', top: '24px', right: '5%', pointerEvents: 'none',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
+              }}>
+                <div style={{
+                  width: '86px', height: '86px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <FaLaptopCode style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                </div>
+                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                  En PC
+                </small>
+              </div>
+
+              <div style={{
+                position: 'absolute', bottom: '22px', left: '6%', pointerEvents: 'none',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
+              }}>
+                <div style={{
+                  width: '86px', height: '86px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <FaHeadset style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                </div>
+                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                  Soporte
+                </small>
+              </div>
+
+              <div style={{
+                position: 'absolute', bottom: '22px', right: '6%', pointerEvents: 'none',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'
+              }}>
+                <div style={{
+                  width: '86px', height: '86px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.10)', border: '2px solid rgba(255,255,255,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <FaChalkboardTeacher style={{ color: '#9fd4ff', fontSize: '2.6rem' }} />
+                </div>
+                <small style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.62rem', fontWeight: '600' }}>
+                  Instructivo
+                </small>
+              </div>
 
               <div style={{ textAlign: 'center', marginBottom: '22px', position: 'relative', zIndex: 1 }}>
                 <img src="/fibextelecom-transparente.png" alt="Fibex Telecom"
