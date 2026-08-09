@@ -12,7 +12,7 @@ import {
   FiSearch, FiPlus, FiCheck, FiLogOut, FiGrid,
   FiUser, FiShield, FiServer, FiWifi, FiDatabase,
   FiCpu, FiMonitor, FiHardDrive, FiActivity, FiGlobe, FiZap,
-  FiPrinter, FiBook, FiLock, FiEye, FiClock, FiFolder, FiFolderPlus
+  FiPrinter, FiBook, FiLock, FiEye, FiClock, FiFolder, FiFolderPlus, FiX
 } from 'react-icons/fi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -49,10 +49,15 @@ const Admin = () => {
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [selectedFolderUsers, setSelectedFolderUsers] = useState([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState('Todas');
+  const [nuevaCategoria, setNuevaCategoria] = useState('');
 
   const categorias = [
     'Manuales', 'Instructivo'
   ];
+
+  const categoriasExistentes = manuals.length > 0
+    ? [...new Set(manuals.map(function(m) { return m.categoria; }))]
+    : categorias;
 
   const catIcons = {
     'Manuales': <FiFileText size={18} />,
@@ -84,10 +89,18 @@ const Admin = () => {
 
   const handleUploadManual = async (e) => {
     e.preventDefault();
+    let categoriaFinal = manualForm.categoria;
+    if (categoriaFinal === '__nueva__') {
+      if (!nuevaCategoria.trim()) {
+        toast.error('Escribe el nombre de la nueva categoria');
+        return;
+      }
+      categoriaFinal = nuevaCategoria.trim();
+    }
     const formData = new FormData();
     formData.append('titulo', manualForm.titulo);
     formData.append('descripcion', manualForm.descripcion);
-    formData.append('categoria', manualForm.categoria);
+    formData.append('categoria', categoriaFinal);
     if (manualForm.folder_id) formData.append('folder_id', manualForm.folder_id);
     if (manualForm.archivo) formData.append('archivo', manualForm.archivo);
     try {
@@ -95,7 +108,7 @@ const Admin = () => {
         await API.put("/manuals/" + editingManual.id, {
           titulo: manualForm.titulo,
           descripcion: manualForm.descripcion,
-          categoria: manualForm.categoria,
+          categoria: categoriaFinal,
           folder_id: manualForm.folder_id || null
         });
         toast.success('Manual actualizado');
@@ -105,6 +118,7 @@ const Admin = () => {
       }
       setShowUploadModal(false);
       setEditingManual(null);
+      setNuevaCategoria('');
       setManualForm({ titulo: '', descripcion: '', categoria: 'Instructivo', archivo: null, folder_id: '' });
       fetchData();
     } catch (error) {
@@ -486,8 +500,7 @@ const Admin = () => {
                   <Form.Select value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)}
                     style={{ maxWidth: '200px', borderRadius: '10px', padding: '8px 15px' }}>
                     <option value="Todas">Todas las categorias</option>
-                    <option value="Manuales">Manuales</option>
-                    <option value="Instructivo">Instructivo</option>
+                    {categoriasExistentes.map(c => <option key={c} value={c}>{c}</option>)}
                   </Form.Select>
                   <div className="d-flex gap-2">
                     <Button onClick={exportManualsToExcel} variant="outline-success"
@@ -905,11 +918,29 @@ const Admin = () => {
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label style={{ fontWeight: '600' }}><FiGrid className="me-1" /> Categoria</Form.Label>
-                  <Form.Select value={manualForm.categoria}
-                    onChange={(e) => setManualForm({ ...manualForm, categoria: e.target.value })}
-                    style={{ borderRadius: '10px', padding: '10px 15px' }}>
-                    {categorias.map(c => <option key={c} value={c}>{c}</option>)}
-                  </Form.Select>
+                  {manualForm.categoria === '__nueva__' ? (
+                    <div className="d-flex gap-2">
+                      <Form.Control value={nuevaCategoria}
+                        onChange={(e) => setNuevaCategoria(e.target.value)}
+                        placeholder="Nombre de la nueva categoria"
+                        required
+                        style={{ borderRadius: '10px', padding: '10px 15px' }} />
+                      <Button variant="outline-secondary" onClick={() => {
+                        setManualForm({ ...manualForm, categoria: 'Instructivo' });
+                        setNuevaCategoria('');
+                      }} title="Cancelar nueva categoria"><FiX /></Button>
+                    </div>
+                  ) : (
+                    <Form.Select value={manualForm.categoria}
+                      onChange={(e) => {
+                        setManualForm({ ...manualForm, categoria: e.target.value });
+                        if (e.target.value === '__nueva__') setNuevaCategoria('');
+                      }}
+                      style={{ borderRadius: '10px', padding: '10px 15px' }}>
+                      {categoriasExistentes.map(c => <option key={c} value={c}>{c}</option>)}
+                      <option value="__nueva__">+ Nueva categoria...</option>
+                    </Form.Select>
+                  )}
                 </Form.Group>
               </Col>
               <Col md={6}>

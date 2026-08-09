@@ -80,7 +80,8 @@ const MisManuales = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
 
-  const categorias = ['Manuales', 'Instructivo'];
+  const categorias = [...new Set(manuals.map(function(m) { return m.categoria; }))];
+  const tabActiva = categorias.includes(categoria) ? categoria : (categorias[0] || 'Manuales');
 
   useEffect(() => { fetchManuals(); }, []);
 
@@ -212,7 +213,7 @@ const MisManuales = () => {
             style={{ border: 'none', padding: '12px 15px', fontSize: '0.95rem' }} />
         </InputGroup>
 
-        <Tabs activeKey={categoria} onSelect={(k) => setCategoria(k)} className="mb-4" style={{ fontWeight: '600' }}>
+        <Tabs activeKey={tabActiva} onSelect={(k) => setCategoria(k)} className="mb-4" style={{ fontWeight: '600' }}>
           {categorias.map(c => (
             <Tab key={c} eventKey={c} title={<span>{catIcons[c] || <FiFileText size={14} />} {c}</span>} />
           ))}
