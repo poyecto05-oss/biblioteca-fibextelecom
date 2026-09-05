@@ -159,12 +159,16 @@ const MisManuales = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f0f4f8' }}>
+    <div style={{ minHeight: '100vh', background: '#f0f4f8', position: 'relative', overflow: 'hidden' }}>
       <div style={{
         background: 'linear-gradient(135deg, #0f2440, #1c3d5a)',
-        padding: '22px 0'
+        padding: '22px 0', position: 'relative', overflow: 'hidden'
       }}>
-        <Container>
+        <div style={{ position: 'absolute', top: '4px', right: '3%', pointerEvents: 'none', color: 'rgba(160,215,255,0.55)', fontSize: '2rem' }}><FiServer /></div>
+        <div style={{ position: 'absolute', bottom: '-2px', right: '38%', pointerEvents: 'none', color: 'rgba(160,215,255,0.40)', fontSize: '1.6rem' }}><FiCpu /></div>
+        <div style={{ position: 'absolute', top: '2px', left: '55%', pointerEvents: 'none', color: 'rgba(160,215,255,0.40)', fontSize: '1.6rem' }}><FiDatabase /></div>
+        <div style={{ position: 'absolute', bottom: '0px', left: '45%', pointerEvents: 'none', color: 'rgba(160,215,255,0.45)', fontSize: '1.7rem' }}><FiMonitor /></div>
+        <Container style={{ position: 'relative', zIndex: 1 }}>
           <div className="d-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center">
               <img src="/logo-fibex.jpg" alt="Fibex" style={{ height: '40px', marginRight: '15px', borderRadius: '8px' }} />
@@ -193,7 +197,7 @@ const MisManuales = () => {
                   <small style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem' }}>{user?.departamento}</small>
                 </div>
               </div>
-              <Button variant="outline-light" size="sm"
+              <Button variant="danger" size="sm"
                 onClick={() => { logout(); navigate('/login'); }}
                 style={{ borderRadius: '8px', padding: '6px 12px' }}>
                 <FiLogOut className="me-1" /> Salir
@@ -203,7 +207,12 @@ const MisManuales = () => {
         </Container>
       </div>
 
-      <Container className="py-4">
+      <div style={{ position: 'absolute', top: '140px', right: '1%', pointerEvents: 'none', color: 'rgba(0,102,204,0.35)', fontSize: '2.8rem', opacity: 0.5 }}><FiGlobe /></div>
+      <div style={{ position: 'absolute', top: '45%', right: '0.5%', pointerEvents: 'none', color: 'rgba(0,102,204,0.28)', fontSize: '2rem', opacity: 0.5 }}><FiZap /></div>
+      <div style={{ position: 'absolute', bottom: '10%', left: '0.5%', pointerEvents: 'none', color: 'rgba(0,102,204,0.35)', fontSize: '3rem', opacity: 0.5 }}><FiHardDrive /></div>
+      <div style={{ position: 'absolute', bottom: '25%', left: '1%', pointerEvents: 'none', color: 'rgba(0,102,204,0.28)', fontSize: '1.8rem', opacity: 0.5 }}><FiWifi /></div>
+
+      <Container className="py-4" style={{ position: 'relative', zIndex: 1 }}>
         <InputGroup className="mb-4" style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
           <InputGroup.Text style={{ background: 'white', border: 'none', paddingLeft: '20px' }}>
             <FiSearch />
